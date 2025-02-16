@@ -1405,6 +1405,15 @@
     "@react-native-aria/interactions" "0.2.13"
     "@react-stately/toggle" "^3.4.4"
 
+"@gluestack-ui/textarea@^0.1.24":
+  version "0.1.24"
+  resolved "https://registry.yarnpkg.com/@gluestack-ui/textarea/-/textarea-0.1.24.tgz#bf3f6379ec49fec21e30aea2ccf79865ecee3625"
+  integrity sha512-maABWaI+Vif9S5twBVzcF1pqv43NMigYuKNM7aNZA5+Mzi3/cf3esPpYjB2VFg3r3VKLZq9JbVFkgLq9MauFxw==
+  dependencies:
+    "@gluestack-ui/form-control" "^0.1.19"
+    "@gluestack-ui/utils" "^0.1.14"
+    "@react-native-aria/focus" "^0.2.9"
+
 "@gluestack-ui/toast@^1.0.8":
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/@gluestack-ui/toast/-/toast-1.0.8.tgz#af77d31fdf5fc440041c3a4e08ede4dd2b950e66"

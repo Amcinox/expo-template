@@ -10,7 +10,10 @@ export const exampleFormSchema = z.object({
     language: z.enum(["en", "es"]),
     country: z.enum(["MA", "JP", "US"]),
     motivation: z.number().min(1).max(100),
-    notification: z.boolean()
+    notification: z.boolean(),
+    bio: z.string().min(10, {
+        message: "Bio must be at least 10 characters."
+    }),
 })
 
 export type ExamplePayload = z.infer<typeof exampleFormSchema>;

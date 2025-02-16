@@ -19,6 +19,7 @@ import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { Card } from "@/components/ui/card";
 import { exampleFormSchema, ExamplePayload } from "@/schemas/example/example.schema";
+import RHFTextarea from "@/components/hook-form/rhf-textarea";
 
 export default function HomeScreen() {
     const form = useForm<ExamplePayload>({
@@ -29,7 +30,8 @@ export default function HomeScreen() {
             language: "en",
             country: "US",
             motivation: 50,
-            notification: true
+            notification: true,
+            bio: ""
         },
     });
 
@@ -69,6 +71,12 @@ export default function HomeScreen() {
                                                 { value: "US", label: "United States" }
                                             ]}
                                         />
+                                        <RHFTextarea
+
+                                            size="sm"
+                                            name="bio"
+                                            label="Bio"
+                                            placeholder="Tell us about yourself" />
                                     </VStack>
                                 </Box>
 
