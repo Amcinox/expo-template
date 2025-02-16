@@ -1,44 +1,41 @@
-// LoginScreen.tsx
-import React, { useState, useEffect } from 'react';
-import { useToast } from "@/components/ui/toast";
-import * as LocalAuthentication from 'expo-local-authentication';
-
+import React from 'react';
 import { VStack } from "@/components/ui/vstack"
-import { FormControl, FormControlLabel, FormControlLabelText } from "@/components/ui/form-control"
-import { Input } from "@/components/ui/input"
-import { InputField } from "@/components/ui/input"
 import { Button, ButtonText } from "@/components/ui/button"
 import { Heading } from "@/components/ui/heading"
 import { Text } from "@/components/ui/text"
 import { Center } from "@/components/ui/center"
 import { Box } from "@/components/ui/box"
 import { useAuth } from '@/auth/AuthContext';
+import FormProvider from '@/components/hook-form/form-provider';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import RHFTextField from '@/components/hook-form/rhf-text-field';
+import { LoginSchema, LoginPayload } from '@/schemas/auth/login.schema';
+
+
 
 
 const LoginScreen = () => {
     const { loginWithPassword, isLoading, isBiometricEnabled, loginWithBiometric } = useAuth();
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const toast = useToast();
-    const [biometricAvailable, setBiometricAvailable] = useState(false);
+    const form = useForm<LoginPayload>({
+        resolver: zodResolver(LoginSchema),
+        defaultValues: {
+            username: "",
+            password: "",
+        },
+    });
 
-    useEffect(() => {
-        const checkBiometricAvailability = async () => {
-            const available = await LocalAuthentication.hasHardwareAsync();
-            setBiometricAvailable(available);
-        };
-        checkBiometricAvailability();
-    }, []);
+    const { handleSubmit } = form;
 
-
-    const handleSubmit = async () => {
+    const login = handleSubmit(async (data: LoginPayload) => {
         try {
-            await loginWithPassword(username, password);
+            await loginWithPassword(data.username, data.password);
         } catch (error: any) {
-            console.log({ error });
-            setPassword('');
+            form.setError("password", {
+                message: error.message,
+            });
         }
-    };
+    })
 
     const handleBiometricLogin = async () => {
         try {
@@ -60,55 +57,41 @@ const LoginScreen = () => {
                     Sign in to continue
                 </Text>
                 <VStack space="md" className="mt-8">
-                    <FormControl>
-                        <FormControlLabel>
-                            <FormControlLabelText className="text-gray-700">Username</FormControlLabelText>
-                        </FormControlLabel>
-                        <Input>
-                            <InputField
-                                type="text"
-                                placeholder="Enter username"
-                                value={username}
-                                onChangeText={setUsername}
-                            />
-                        </Input>
-                    </FormControl>
-                    <FormControl>
-                        <FormControlLabel>
-                            <FormControlLabelText className="text-gray-700">Password</FormControlLabelText>
-                        </FormControlLabel>
-                        <Input>
-                            <InputField
-                                type="password"
-                                placeholder="Enter password"
-                                value={password}
-                                onChangeText={setPassword}
-                                onSubmitEditing={handleSubmit} // Submit on Enter key
-                            />
-                        </Input>
-                    </FormControl>
-
-                    <Button
-                        isDisabled={isLoading}
-                        onPress={handleSubmit}
-                    >
-                        <ButtonText>
-                            {isLoading ? "Logging In..." : "Login"}
-                        </ButtonText>
-                    </Button>
-
-                    {isBiometricEnabled && biometricAvailable && (
+                    <FormProvider methods={form}>
+                        <RHFTextField
+                            name="username"
+                            label="Username"
+                            type="text"
+                            placeholder="Enter username"
+                        />
+                        <RHFTextField
+                            name="password"
+                            label="Password"
+                            placeholder="Enter password"
+                            type="password"
+                        />
                         <Button
-                            variant="outline"
                             isDisabled={isLoading}
-                            onPress={handleBiometricLogin}
-                            className="mt-2"
+                            onPress={login}
                         >
                             <ButtonText>
-                                Login with Biometrics
+                                {isLoading ? "Logging In..." : "Login"}
                             </ButtonText>
                         </Button>
-                    )}
+
+                        {isBiometricEnabled && (
+                            <Button
+                                variant="outline"
+                                isDisabled={isLoading}
+                                onPress={handleBiometricLogin}
+                                className="mt-2"
+                            >
+                                <ButtonText>
+                                    Login with Biometrics
+                                </ButtonText>
+                            </Button>
+                        )}
+                    </FormProvider>
                 </VStack>
             </Box>
         </Center>

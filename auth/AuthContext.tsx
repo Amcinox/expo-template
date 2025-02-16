@@ -2,24 +2,18 @@ import React, {
     createContext,
     useEffect,
     useCallback,
-    Dispatch,
-    SetStateAction,
     useReducer,
 } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import * as LocalAuthentication from 'expo-local-authentication';
-import { AppState, Button, Pressable } from 'react-native';
-import { Toast, ToastDescription, ToastTitle, useToast } from "@/components/ui/toast";
+import { AppState } from 'react-native';
 import { AuthContextType } from './auth-types';
 import { authReducer } from './authReducer';
 import { decodeIdToken, refreshAuthTokens } from './auth-helpers';
-import { StorageKeys } from './auth-constants'; // We'll create this file next
+import { StorageKeys } from './auth-constants';
 import { apiHandler } from '@/api/apiHandler';
 import { endpoints } from '@/api/endpoints';
-import { LoginResponse } from '@/types/auth'; // Adjust path if necessary
-import { ButtonText } from '@/components/ui/button';
-import { HStack } from '@/components/ui/hstack';
-import { VStack } from '@/components/ui/vstack';
+import { LoginResponse } from '@/types/auth';
 
 
 const defaultAuthContextValue: AuthContextType = {
@@ -264,8 +258,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, defaultAut
                 promptMessage: 'Login with Biometrics',
                 fallbackLabel: 'Use Password',
             });
-
-
             if (biometricResult.success) {
                 const storedRefreshToken = await SecureStore.getItemAsync(StorageKeys.REFRESH_TOKEN_KEY);
                 const storedAccessToken = await SecureStore.getItemAsync(StorageKeys.ACCESS_TOKEN_KEY);

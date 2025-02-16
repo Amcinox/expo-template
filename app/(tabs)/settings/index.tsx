@@ -55,7 +55,7 @@ const SettingsScreen = () => {
                     {JSON.stringify(user)}
                 </Text>
                 <VStack space="xl">
-                    <HStack >
+                    <HStack>
                         <Text className="text-lg font-semibold text-gray-700">Enable Biometric Login</Text>
                         <Switch
                             isDisabled={isLoading}
@@ -65,9 +65,19 @@ const SettingsScreen = () => {
                     </HStack>
 
                     <Button
+                        collapsable
+
+                        variant="solid"
+                        onPress={handleLogout}
+
+                    >
+                        <ButtonText>Logout</ButtonText>
+                    </Button>
+
+                    <Button
                         variant="link"
                         onPress={() => router.push("/settings/bank-information")}
-                        isDisabled={isLoading}
+
                         className="rounded-md bg-green-500 hover:bg-green-600 py-2 mt-4"
                     >
                         <ButtonText className="text-white font-semibold">Bank Informations</ButtonText>
@@ -76,7 +86,6 @@ const SettingsScreen = () => {
                     <Button
                         variant="link"
                         onPress={() => router.push("/settings/basic-information")}
-                        isDisabled={isLoading}
                         className="rounded-md bg-green-500 hover:bg-green-600 py-2 mt-4"
                     >
                         <ButtonText className="text-white font-semibold">Basic Informations</ButtonText>
@@ -86,7 +95,7 @@ const SettingsScreen = () => {
                     <Button
                         variant="link"
                         onPress={() => router.push("/settings/biometric")}
-                        isDisabled={isLoading}
+
                         className="rounded-md bg-green-500 hover:bg-green-600 py-2 mt-4"
                     >
                         <ButtonText className="text-white font-semibold">Biometric</ButtonText>
@@ -96,7 +105,7 @@ const SettingsScreen = () => {
                     <Button
                         variant="link"
                         onPress={() => router.push("/settings/change-password")}
-                        isDisabled={isLoading}
+
                         className="rounded-md bg-green-500 hover:bg-green-600 py-2 mt-4"
                     >
                         <ButtonText className="text-white font-semibold">Change Password</ButtonText>
@@ -105,7 +114,6 @@ const SettingsScreen = () => {
                     <Button
                         variant="link"
                         onPress={() => router.push("/settings/employer-information")}
-                        isDisabled={isLoading}
                         className="rounded-md bg-green-500 hover:bg-green-600 py-2 mt-4"
                     >
                         <ButtonText className="text-white font-semibold">Employer Information</ButtonText>

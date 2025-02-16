@@ -6,11 +6,14 @@ export default function _layout() {
     return (
         <Stack
             screenOptions={{
-                headerShown: false
+                headerShown: false,
             }}
         >
             <Stack.Screen name="index" options={{ title: 'Home' }} />
-            <Stack.Screen name="make-advance" options={{ title: "Make Advance" }} />
+            <Stack.Screen name="make-advance" options={{
+                title: "Make Advance",
+
+            }} />
         </Stack>
     );
 }

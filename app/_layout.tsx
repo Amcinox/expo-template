@@ -51,7 +51,7 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const { isAuthenticated, isInitialized, user } = useAuth(); // Get isAuthenticated and isInitialLoading
+  const { isAuthenticated, isInitialized, user } = useAuth();
 
 
 
