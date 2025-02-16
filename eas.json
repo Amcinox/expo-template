@@ -1,0 +1,58 @@
+{
+    "cli": {
+        "appVersionSource": "remote"
+    },
+    "build": {
+        "development-simulator": {
+            "developmentClient": true,
+            "distribution": "internal",
+            "ios": {
+                "simulator": true
+            }
+        },
+        "development": {
+            "ios": {
+                "credentialsSource": "remote",
+                "autoIncrement": true
+            },
+            "android": {
+                "autoIncrement": true
+            }
+        },
+        "preview": {
+            "ios": {
+                "credentialsSource": "remote",
+                "autoIncrement": true
+            },
+            "android": {
+                "autoIncrement": true
+            }
+        },
+        "production": {
+            "ios": {
+                "credentialsSource": "remote",
+                "autoIncrement": true
+            },
+            "android": {
+                "autoIncrement": true
+            }
+        }
+    },
+    "submit": {
+        "development": {
+            "ios": {
+                "ascAppId": "6504211931"
+            }
+        },
+        "preview": {
+            "ios": {
+                "ascAppId": "6504212131"
+            }
+        },
+        "production": {
+            "ios": {
+                "ascAppId": "6473286747"
+            }
+        }
+    }
+}

@@ -1,0 +1,71 @@
+name: EAS Build and Submit
+
+on:
+  push:
+    branches:
+      - dev
+      - stg
+      - prod
+
+jobs:
+  build-and-submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📚 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: 📦 Install dependencies
+        run: yarn install
+
+      - name: 🔍 Determine environment
+        id: determine_env
+        run: |
+          if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
+            echo "APP_ENV=dev" >> $GITHUB_OUTPUT
+            echo "EAS_PROFILE=development" >> $GITHUB_OUTPUT
+            echo "ANDROID_TRACK=internal" >> $GITHUB_OUTPUT
+          elif [[ ${{ github.ref }} == 'refs/heads/stg' ]]; then
+            echo "APP_ENV=stg" >> $GITHUB_OUTPUT
+            echo "EAS_PROFILE=preview" >> $GITHUB_OUTPUT
+            echo "ANDROID_TRACK=internal" >> $GITHUB_OUTPUT
+          elif [[ ${{ github.ref }} == 'refs/heads/prod' ]]; then
+            echo "APP_ENV=prod" >> $GITHUB_OUTPUT
+            echo "EAS_PROFILE=production" >> $GITHUB_OUTPUT
+            echo "ANDROID_TRACK=production" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install EAS CLI
+        run: npm install -g eas-cli@10.2.2
+
+      - name: 🚀 Build and submit iOS
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          APP_ENV: ${{ steps.determine_env.outputs.APP_ENV }}
+          EAS_PROFILE: ${{ steps.determine_env.outputs.EAS_PROFILE }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          EAS_PROJECT_ID: ${{ secrets.EAS_PROJECT_ID }}
+          APP_VERSION: ${{ github.run_number }}
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: |
+          eas build --platform ios --profile $EAS_PROFILE --non-interactive
+          eas submit -p ios --latest --non-interactive
+
+      - name: 🤖 Build and submit Android
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          APP_ENV: ${{ steps.determine_env.outputs.APP_ENV }}
+          EAS_PROFILE: ${{ steps.determine_env.outputs.EAS_PROFILE }}
+          ANDROID_TRACK: ${{ steps.determine_env.outputs.ANDROID_TRACK }}
+          EAS_PROJECT_ID: ${{ secrets.EAS_PROJECT_ID }}
+          APP_VERSION: ${{ github.run_number }}
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: |
+          eas build --platform android --profile $EAS_PROFILE --non-interactive
+          eas submit -p android --latest --non-interactive
