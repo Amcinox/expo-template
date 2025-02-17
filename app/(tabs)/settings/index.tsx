@@ -18,13 +18,16 @@ import _ from 'lodash';
 import { CircleIcon } from '@/components/ui/icon';
 import { languagesList } from '@/constants/language';
 import { Languages } from '@/types/settings';
+import { defaultThemes } from '@/constants/Colors';
+
+
 
 
 
 const SettingsScreen = () => {
-    const { logout, isBiometricEnabled, enableBiometric, disableBiometric, isLoading, user } = useAuth();
     const toast = useToast();
-    const { updateLanguage, language, device, networkState, permissions } = useSettings();
+    const { logout, isBiometricEnabled, enableBiometric, disableBiometric, isLoading } = useAuth();
+    const { updateLanguage, updateTheme, theme, language, device, networkState, permissions } = useSettings();
     const { t } = useTranslation();
 
 
@@ -51,18 +54,18 @@ const SettingsScreen = () => {
     }, [disableBiometric, enableBiometric, toast]);
 
     return (
-        <ScrollView className="bg-gray-50">
+        <ScrollView className="bg-[--background-50]">
             <Center className="p-4">
-                <Box className="w-full max-w-md">
+                <Box className="w-full max-w-md ">
                     <VStack className="space-y-6" space="lg">
-                        <Box className="bg-white rounded-xl p-4 shadow-sm">
-                            <Heading size="xl" className="text-gray-800">
+                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
+                            <Heading size="xl" >
                                 {t('Settings')}
                             </Heading>
                         </Box>
 
-                        <Box className="bg-white rounded-xl p-4 shadow-sm">
-                            <Heading size="sm" className="text-gray-700 mb-4">
+                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
+                            <Heading size="sm" className=" mb-4">
                                 {t('Language')}
                             </Heading>
 
@@ -83,13 +86,37 @@ const SettingsScreen = () => {
                                 ))}
                             </RadioGroup>
                         </Box>
-                        <Box className="bg-white rounded-xl p-4 shadow-sm">
-                            <Heading size="sm" className="text-gray-700 mb-4">
+
+                        {/* Theme */}
+                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
+                            <Heading size="sm" className=" mb-4">
+                                {t('Themes')}
+
+                            </Heading>
+                            <VStack className="space-y-4" space="lg">
+                                {defaultThemes.map((item) => (
+                                    <Button
+
+                                        disabled={JSON.stringify(item.colors) === JSON.stringify(theme)}
+                                        key={item.title}
+                                        variant="solid"
+                                        onPress={() => updateTheme(item.colors)}
+                                        className="bg-gray-100 rounded-lg py-2.5"
+                                    >
+                                        <ButtonText className="text-gray-700">
+                                            {item.title}
+                                        </ButtonText>
+                                    </Button>
+                                ))}
+                            </VStack>
+                        </Box>
+                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
+                            <Heading size="sm" className="mb-4">
                                 {t('Security')}
                             </Heading>
                             <VStack className="space-y-4" space="lg">
                                 <HStack className="justify-between items-center">
-                                    <Text className="text-gray-700">{t('Biometric Login')}</Text>
+                                    <Text >{t('Biometric Login')}</Text>
                                     <Switch
                                         isDisabled={isLoading}
                                         value={isBiometricEnabled}
@@ -97,18 +124,19 @@ const SettingsScreen = () => {
                                     />
                                 </HStack>
                                 <Button
-                                    variant="link"
+                                    action="primary"
+                                    variant="solid"
                                     onPress={() => router.push("/settings/change-password")}
-                                    className="bg-blue-500 rounded-lg py-2.5"
+                                    className="rounded-lg py-2.5"
                                 >
                                     <ButtonText className="text-white">
                                         {t('Change Password')}
                                     </ButtonText>
                                 </Button>
                                 <Button
-                                    variant="link"
+                                    variant="solid"
                                     onPress={() => router.push("/settings/biometric")}
-                                    className="bg-blue-500 rounded-lg py-2.5"
+                                    className="rounded-lg py-2.5"
                                 >
                                     <ButtonText className="text-white">
                                         {t('Biometric Settings')}
@@ -117,7 +145,7 @@ const SettingsScreen = () => {
                             </VStack>
                         </Box>
 
-                        <Box className="bg-white rounded-xl p-4 shadow-sm">
+                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
                             <Heading size="sm" className="text-gray-700 mb-4">
                                 {t('Profile Information')}
                             </Heading>
@@ -154,7 +182,7 @@ const SettingsScreen = () => {
 
 
 
-                        <Box className="bg-white rounded-xl p-4 shadow-sm">
+                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
                             <Heading size="sm" className="text-gray-700 mb-4">
                                 {t('Device')}
                             </Heading>
@@ -172,7 +200,7 @@ const SettingsScreen = () => {
                         </Box>
 
 
-                        <Box className="bg-white rounded-xl p-4 shadow-sm">
+                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
                             <Heading size="sm" className="text-gray-700 mb-4">
                                 {t('Network State')}
                             </Heading>
@@ -192,7 +220,7 @@ const SettingsScreen = () => {
 
 
                         {/* //permission box */}
-                        <Box className="bg-white rounded-xl p-4 shadow-sm">
+                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
                             <Heading size="sm" className="text-gray-700 mb-4">
                                 {t('Permissions')}
                             </Heading>
@@ -220,7 +248,7 @@ const SettingsScreen = () => {
 
 
 
-                        <Box className="bg-white rounded-xl p-4 shadow-sm">
+                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
                             <Button
                                 variant="solid"
                                 onPress={async () => await logout()}

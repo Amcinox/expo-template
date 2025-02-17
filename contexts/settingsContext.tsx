@@ -46,7 +46,18 @@ const initialState: SettingsState = {
     [InitialState.colorSchemeName]: "dark",
     [InitialState.walkThrough]: false,
     [InitialState.notification]: false,
-    [InitialState.theme]: {},
+    [InitialState.theme]: {
+        primary: "#96C428",
+        secondary: "#f44336",
+        success: "#4caf50",
+        warning: "#ffeb3b",
+        error: "#f44336",
+        info: "#2196f3",
+        typography: "#4F5259",
+        caption: "#4F5259",
+        background: "#444659",
+        outline: "#BDBDBD"
+    },
     permissions: {
         location: false,
         camera: false,
@@ -121,6 +132,7 @@ const handlers: Record<string, (state: SettingsState, action: SettingsAction) =>
     },
 
     UPDATE_THEME: (state, action) => {
+        console.log({ newTheme: action.payload.theme })
         return {
             ...state,
             theme: action.payload.theme
@@ -337,20 +349,17 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                     biometricInfo,
                 ] = await Promise.all([
                     getMultiFromAsyncStorage(
-                        [{ key: InitialState.colorSchemeName, defaultValue: state.colorSchemeName },
-                        { key: InitialState.language, defaultValue: state.language },
-                        { key: InitialState.walkThrough, defaultValue: state.walkThrough },
-                        { key: InitialState.theme, defaultValue: state.theme },
+                        [
+                            { key: InitialState.colorSchemeName, defaultValue: initialState.colorSchemeName },
+                            { key: InitialState.language, defaultValue: initialState.language },
+                            { key: InitialState.walkThrough, defaultValue: initialState.walkThrough },
+                            { key: InitialState.theme, defaultValue: initialState.theme },
                         ]),
                     getDeviceInfo(),
                     registerForPushNotificationsAsync(),
                     getBiometricInfo(),
 
                 ])
-
-
-
-
                 const { colorSchemeName, language, walkThrough, theme } = storageSettings;
                 await i18n.changeLanguage(language as string)
 

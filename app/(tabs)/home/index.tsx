@@ -132,10 +132,10 @@ export default function HomeScreen() {
                                     </Button>
                                     <Button
                                         variant="solid"
-                                        className="bg-blue-500 "
+
                                         onPress={form.handleSubmit((data) => console.log(data))}
                                     >
-                                        <ButtonText className="text-white">{t("Save")}</ButtonText>
+                                        <ButtonText >{t("Save")}</ButtonText>
                                     </Button>
                                 </HStack>
                             </VStack>

@@ -64,5 +64,14 @@ export enum Languages {
 
 
 export interface Theme {
-
+    primary?: string;
+    secondary?: string;
+    success?: string;
+    warning?: string;
+    error?: string;
+    info?: string;
+    text?: string;
+    caption?: string;
+    background?: string;
+    [key: string]: string | undefined;
 }
