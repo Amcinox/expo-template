@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, defaultAut
 
     const loadInitialAuthState = useCallback(async () => {
         try {
-            dispatch({ type: 'SET_IS_INITIALIZED', payload: true }); // Mark as initialized at the beginning
+
             const storedRefreshToken = await SecureStore.getItemAsync(StorageKeys.REFRESH_TOKEN_KEY);
             const storedAccessToken = await SecureStore.getItemAsync(StorageKeys.ACCESS_TOKEN_KEY);
             const biometricEnabled = await SecureStore.getItemAsync(StorageKeys.IS_BIOMETRIC_ENABLED_KEY);
