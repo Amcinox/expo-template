@@ -24,13 +24,6 @@ type EndpointConfig<T extends Partial<ResourceParams>> = {
 
 
 
-export enum HTTPMethod {
-    GET = "GET",
-    POST = "POST",
-    PUT = "PUT",
-    DELETE = "DELETE",
-    PATCH = "PATCH",
-}
 
 export interface FetchConfig<TData, TError> {
     endpoint: string;
@@ -47,10 +40,20 @@ export interface FetchConfig<TData, TError> {
     onError?: (error: TError) => void | Promise<void>;
     onRetry?: (attempt: number, error: TError) => void | Promise<void>;
     authorized?: boolean;
+    onUploadProgress?: (progressEvent: any) => void; // Added onUploadProgress here
 }
 
 export interface FetchError {
     message: string;
     status?: number;
     data?: unknown;
+}
+
+export enum HTTPMethod {
+    GET = 'GET',
+    POST = 'POST',
+    PUT = 'PUT',
+    PATCH = 'PATCH',
+    DELETE = 'DELETE',
+
 }

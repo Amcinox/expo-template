@@ -1,171 +1,115 @@
-import { FetchConfig, FetchError } from "@/types/api";
+import { HTTPMethod } from '@/types/api';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosProgressEvent } from 'axios';
 
-export class ApiError extends Error {
-  constructor(
-    message: string,
-    public readonly status: number,
-    public readonly data?: any
-  ) {
-    super(message);
-    this.name = 'ApiError';
-    Object.setPrototypeOf(this, ApiError.prototype);
-  }
+interface FetchRequest<T> {
+  endpoint: string;
+  method: HTTPMethod;
+  headers?: Record<string, string>;
+  body?: T;
+  params?: Record<string, any>;
+  config?: AxiosRequestConfig;
+  retry?: number;
+  delay?: number;
+  onUploadProgress?: (progressEvent: AxiosProgressEvent) => void;
 }
 
+interface ApiResponse<R> extends AxiosResponse<R> {
+  // Custom properties if needed
+}
 
-export class ApiHandler {
-  private baseUrl: string;
-  private defaultConfig: Partial<FetchConfig<any, any>>;
+class ApiHandler {
+  private axiosInstance: AxiosInstance;
+  private defaultRetryCount: number;
+  private defaultRetryDelay: number;
 
-  constructor(baseUrl: string, defaultConfig: Partial<FetchConfig<any, any>> = {}) {
-    this.baseUrl = baseUrl;
-    this.defaultConfig = defaultConfig;
-  }
-
-  private createUrl(endpoint: string, params?: Record<string, string>): string {
-    const normalizedBaseUrl = this.baseUrl.endsWith('/')
-      ? this.baseUrl.slice(0, -1)
-      : this.baseUrl;
-
-    const normalizedEndpoint = endpoint.startsWith('/')
-      ? endpoint
-      : `/${endpoint}`;
-
-    const url = new URL(normalizedBaseUrl + normalizedEndpoint);
-
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        url.searchParams.append(key, value);
-      });
-    }
-
-    return url.toString();
-  }
-
-  private async fetchWithTimeout(
-    request: Request,
-    timeout?: number
-  ): Promise<Response> {
-    if (!timeout) {
-      return fetch(request);
-    }
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-    try {
-      const response = await fetch(request, {
-        signal: controller.signal,
-      });
-      return response;
-    } finally {
-      clearTimeout(timeoutId);
-    }
-  }
-
-  private async handleResponse<TData>(response: Response): Promise<TData> {
-    const contentType = response.headers.get('content-type');
-
-    if (!response.ok) {
-      let errorData;
-      if (contentType?.includes('application/json')) {
-        errorData = await response.json();
-      } else {
-        errorData = await response.text();
-      }
-      throw new ApiError(
-        errorData?.message || 'Request failed',
-        response.status,
-        errorData
-      );
-    }
-
-    if (contentType?.includes('application/json')) {
-      return response.json();
-    }
-
-    return response.text() as unknown as TData;
-  }
-
-  private async delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  async fetch<TData, TError = FetchError>(
-    config: FetchConfig<TData, TError>
-  ): Promise<TData> {
-    const mergedConfig = { ...this.defaultConfig, ...config };
-    const {
-      endpoint,
-      method = 'GET',
-      body,
-      headers: customHeaders,
-      params,
-      timeout,
-      retry,
-      onSuccess,
-      onError,
-      onRetry,
-      authorized = true
-    } = mergedConfig;
-    const url = this.createUrl(endpoint, params);
-
-    const headers = new Headers({
-      'Content-Type': 'application/json',
-      ...customHeaders,
+  constructor(baseURL: string, config?: AxiosRequestConfig) {
+    this.axiosInstance = axios.create({
+      baseURL,
+      ...config,
     });
 
-    if (authorized) {
-      const session = { idToken: "" }
-      if (session?.idToken) {
-        headers.set('authorization', `Bearer ${session.idToken}`);
+    this.defaultRetryCount = config?.maxRedirects || 3;
+    this.defaultRetryDelay = 1000;
+
+    this.axiosInstance.interceptors.request.use(
+      (config) => {
+        config.headers['Request-Start-Time'] = new Date().getTime();
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
       }
-    }
+    );
 
-    const requestInit: RequestInit = {
-      method,
-      headers,
-    };
+    this.axiosInstance.interceptors.response.use(
+      (response) => {
+        const requestStartTime = response.config.headers['Request-Start-Time'] as number;
+        if (requestStartTime) {
+          const responseTime = new Date().getTime() - requestStartTime;
+          console.log(`API Request to ${response.config.url} took ${responseTime}ms`);
+        }
+        return response;
+      },
+      async (error) => {
+        const originalRequest = error.config;
 
-    if (method !== 'GET' && body) {
-      requestInit.body = JSON.stringify(body);
-    }
+        if (error.code === 'ECONNABORTED' && originalRequest && !originalRequest._retryAttempt) {
+          originalRequest._retryAttempt = 1;
+          const retryCount = originalRequest.retry || this.defaultRetryCount;
+          const delay = originalRequest.delay || this.defaultRetryDelay;
 
-
-    const request = new Request(url, requestInit);
-    let lastError: TError | undefined;
-    const attempts = retry?.attempts ?? 1;
-
-    for (let attempt = 1; attempt <= attempts; attempt++) {
-      try {
-        const response = await this.fetchWithTimeout(request, timeout);
-        const data = await this.handleResponse<TData>(response);
-
-        await onSuccess?.(data);
-        return data;
-
-      } catch (error) {
-        lastError = error as TError;
-
-        if (attempt < attempts) {
-          await onRetry?.(attempt, lastError);
-          await this.delay(retry?.delay ?? 1000);
-          continue;
+          while (originalRequest._retryAttempt <= retryCount) {
+            console.log(`Request timeout, retrying attempt ${originalRequest._retryAttempt}/${retryCount} after ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            try {
+              const response = await this.axiosInstance(originalRequest);
+              return response;
+            } catch (retryError: any) {
+              console.error(`Retry attempt ${originalRequest._retryAttempt} failed:`, retryError.message);
+              originalRequest._retryAttempt++;
+              if (originalRequest._retryAttempt > retryCount) {
+                console.error(`Max retry attempts reached for request: ${originalRequest.url}`);
+                break;
+              }
+            }
+          }
         }
 
-        await onError?.(lastError);
-        throw lastError;
+        if (error.response) {
+          console.error(`API Error for ${originalRequest.url}: Status ${error.response.status}`, error.response.data);
+          return Promise.reject(error);
+        } else if (error.request) {
+          console.error(`No response for request to ${originalRequest.url}:`, error.request);
+          return Promise.reject(new Error("ERR_NO_RESPONSE"));
+        } else {
+          console.error('Error setting up request:', error.message);
+          return Promise.reject(error);
+        }
       }
-    }
+    );
+  }
 
-    throw lastError;
+  public async fetch<R = any, T = any>(request: FetchRequest<T>): Promise<ApiResponse<R>> {
+    const { endpoint, method, headers, body, params, config: requestConfig, onUploadProgress } = request;
+
+    try {
+      const response: ApiResponse<R> = await this.axiosInstance.request<R>({
+        url: endpoint,
+        method,
+        headers,
+        data: body,
+        params,
+        ...requestConfig,
+        onUploadProgress,
+      });
+      return response;
+    } catch (error: any) {
+      throw error;
+    }
   }
 }
 
-
-export const apiHandler = new ApiHandler("https://zn4tfbui5k.execute-api.eu-west-2.amazonaws.com/dev/")
-
+export default ApiHandler;
 
 
-
-
+export const apiHandler = new ApiHandler(process.env.EXPO_PUBLIC_API_URL!)
