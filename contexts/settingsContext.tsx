@@ -1,91 +1,26 @@
-import { getMultiFromAsyncStorage, saveItem } from '@/utils/AsyncStorage';
 import { createContext, useCallback, useContext, useEffect, useReducer } from 'react';
+import { getMultiFromAsyncStorage, saveItem } from '@/utils/AsyncStorage';
 import { useTranslation } from 'react-i18next';
 import { ColorSchemeName, Platform } from 'react-native';
-import * as Device from 'expo-device'; // Expo Device API
 import { NetworkState, useNetworkState } from 'expo-network';
-import { DeviceType } from 'expo-device';
+import * as Device from 'expo-device';
 import * as Application from 'expo-application';
-import { AuthenticationType, hasHardwareAsync, supportedAuthenticationTypesAsync } from 'expo-local-authentication';
-
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
+import { AuthenticationType, hasHardwareAsync, supportedAuthenticationTypesAsync } from 'expo-local-authentication';
+import { DeviceDetails, Languages, Theme, Permissions } from '@/types/settings';
 
 
 
 
-export interface Permissions {
-    location?: boolean;
-    camera: boolean;
-    notifications: boolean;
-    contacts?: boolean;
-    microphone: boolean;
-    cameraRoll: boolean;
-    mediaLibrary: boolean;
-    motion?: boolean;
 
-    bluetooth?: boolean;
-    speechRecognition?: boolean;
-    tracking?: boolean;
-    biometric?: {
-        isEnrolled: boolean;
-        hasHardware: boolean;
-        authenticationType: AuthenticationType[];
-    }
-}
-
-export type DeviceDetails = {
-
-    brand?: string | null // Android: "google", "xiaomi"; iOS: "Apple"; web: null
-    designName?: string | null; // Android: "kminilte"; iOS: null; web: null
-    deviceName?: string | null; // "Simo's iPhone 16 Pro Max"
-    deviceType?: DeviceType | null // UNKNOWN, PHONE, TABLET, TV, DESKTOP
-    deviceYearClass?: number | null;
-    isDevice?: boolean | null;
-    manufacturer?: string | null; // Android: "Google", "xiaomi"; iOS: "Apple"; web: "Google", null
-    modelId?: any; // iOS: "iPhone7,2"; Android: null; web: null
-    modelName?: string | null; // Android: "Pixel 2"; iOS: "iPhone XS Max"; web: "iPhone", null
-    osBuildFingerprint?: string | null; // Android: "google/walleye/walleye:8.1.0/OPM1.171019.011/4448085:user/release-keys"; iOS: null; web: null
-    osBuildId?: string | null; // Android: "PSR1.180720.075"; iOS: "16F203"; web: null
-    osInternalBuildId?: string | null; // Android: "MMB29K"; iOS: "16F203"; web: null,
-    osName?: string | null; // Android: "Android", "iOS"; iOS: "iOS"; web: "Web", null
-    osVersion?: string | null; // Android: "4.0.3"; iOS: "18.0.1"; web: "11.0", "8.1.0"
-    platformApiLevel?: number | null; // Android: 19; iOS: null; web: null
-    productName?: string | null; // Android: "kminiltexx"; iOS: null; web: null
-    supportedCpuArchitectures?: string[] | null; // ['arm64 v8', 'Intel x86-64h Haswell', 'arm64-v8a', 'armeabi-v7a", 'armeabi']
-    totalMemory?: number | null; // 17179869184
-
-    applicationId?: string | null; // "com.remirage.app", "com.apple.Pages"
-    applicationName: string | null; // "Expo", "Remirage", "Instagram"
-    nativeApplicationVersion?: string | null; // "2.11.0"
-    nativeBuildVersion?: string | null; // Android: "114", iOS: "2.11.0"
-
-
-    pushNotificationToken?: string | null;
-
-
-
-
-}
-export enum Languages {
-    EN = "en",
-    FR = "fr",
-    JA = "ja",
-    ES = "es",
-
-}
-
-
-interface theme {
-
-}
 
 export interface SettingsState {
     settingsInitilized: boolean;
     settingsError: null | string;
     walkThrough: boolean;
     language: Languages;
-    theme: theme;
+    theme: Theme;
     notification: boolean;
     colorSchemeName: ColorSchemeName;
     permissions: Permissions
@@ -152,7 +87,7 @@ type SettingsAction =
     | { type: SettingsActionType.UPDATE_LANGUAGE; payload: { language: Languages } }
     | { type: SettingsActionType.UPDATE_NOTIFICATION; payload: { notification: boolean } }
     | { type: SettingsActionType.UPDATE_WALKTHROUGH; payload: { walkThrough: boolean } }
-    | { type: SettingsActionType.UPDATE_THEME; payload: { theme: theme } }
+    | { type: SettingsActionType.UPDATE_THEME; payload: { theme: Theme } }
     | { type: SettingsActionType.UPDATE_DEVICE_INFO; payload: { device: DeviceDetails | null } }
     | { type: SettingsActionType.UPDATE_INITIAL_PERMISSIONS; payload: { permissions: Permissions } }
     | { type: SettingsActionType.UPDATE_NETWORK_STATE; payload: { networkState: NetworkState } }
@@ -265,7 +200,7 @@ interface SettingsContextProps extends SettingsState {
     updateColorScheme: (colorSchemeName: ColorSchemeName) => Promise<void>;
     updateLanguage: (language: Languages) => Promise<void>;
     updateWalkThrough: (walkThrough: boolean) => Promise<void>;
-    updateTheme: (theme: theme) => Promise<void>;
+    updateTheme: (theme: Theme) => Promise<void>;
 
 
 }
@@ -392,9 +327,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     }, []);
 
 
-
-
-    // set settings, permissions and device info on app start up
     useEffect(() => {
         const loadAsyncStorage = async () => {
             try {
@@ -503,7 +435,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
     }, []);
 
-    const updateTheme = useCallback(async (theme: theme) => {
+    const updateTheme = useCallback(async (theme: Theme) => {
         // save to async storage
         await saveItem(InitialState.theme, theme)
         // update state
@@ -519,6 +451,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const updateLanguage = useCallback(async (language: Languages) => {
         try {
             // save to async storage
+            i18n.changeLanguage(language);
             await saveItem(InitialState.language, language)
             // update state
             dispatch({

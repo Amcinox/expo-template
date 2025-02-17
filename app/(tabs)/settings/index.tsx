@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { router } from 'expo-router';
 import { useToast } from "@/components/ui/toast";
 import { VStack } from "@/components/ui/vstack"
@@ -10,34 +10,32 @@ import { Heading } from "@/components/ui/heading"
 import { Center } from "@/components/ui/center"
 import { Box } from "@/components/ui/box"
 import { useAuth } from '@/auth/AuthContext';
-import { Languages, useSettings } from '@/contexts/settingsContext';
+import { useSettings } from '@/contexts/settingsContext';
 import { useTranslation } from 'react-i18next';
 import { RadioGroup, Radio, RadioIndicator, RadioLabel, RadioIcon } from "@/components/ui/radio"
 import { ScrollView } from 'react-native';
 import _ from 'lodash';
 import { CircleIcon } from '@/components/ui/icon';
+import { languagesList } from '@/constants/language';
+import { Languages } from '@/types/settings';
 
 
 
 const SettingsScreen = () => {
     const { logout, isBiometricEnabled, enableBiometric, disableBiometric, isLoading, user } = useAuth();
     const toast = useToast();
-    const { updateLanguage, language, updatePermission, device, networkState, permissions } = useSettings();
-    const { t, i18n } = useTranslation();
+    const { updateLanguage, language, device, networkState, permissions } = useSettings();
+    const { t } = useTranslation();
 
-    useEffect(() => {
-        updatePermission("camera", true);
-    }, [updatePermission]);
 
     const languageHandler = (language: Languages) => {
-        i18n.changeLanguage(language);
         updateLanguage(language);
     };
 
     const handleBiometricToggle = useCallback(async (value: boolean) => {
         if (value) {
             try {
-                await enableBiometric();
+                await enableBiometric("");
             } catch (error) {
                 console.error("Error enabling biometric:", error);
                 toast.show({});
@@ -69,10 +67,10 @@ const SettingsScreen = () => {
                             </Heading>
 
                             <RadioGroup value={language} onChange={(value) => languageHandler(value)}>
-                                {Object.keys(Languages).map((key) => (
+                                {languagesList.map((lang) => (
                                     <Radio
-                                        key={key}
-                                        value={Languages[key as keyof typeof Languages]}
+                                        key={lang.value}
+                                        value={lang.value}
                                         size="md"
                                         isInvalid={false}
                                         isDisabled={false}
@@ -80,7 +78,7 @@ const SettingsScreen = () => {
                                         <RadioIndicator>
                                             <RadioIcon as={CircleIcon} />
                                         </RadioIndicator>
-                                        <RadioLabel>{Languages[key as keyof typeof Languages]}</RadioLabel>
+                                        <RadioLabel>{lang.title} {lang.flag}</RadioLabel>
                                     </Radio>
                                 ))}
                             </RadioGroup>
@@ -165,7 +163,7 @@ const SettingsScreen = () => {
                                 {device && Object.keys(device).map((key) => (
                                     <HStack key={key} className="justify-between items-center">
                                         <Text className="text-gray-700">{_.startCase(key)}</Text>
-                                        <Text className="text-gray-700">
+                                        <Text className="text-gray-700  max-w-32" numberOfLines={1}>
                                             {typeof device[key as keyof typeof device] === 'boolean' ? device[key as keyof typeof device] ? 'Yes' : 'No' : device[key as keyof typeof device]}
                                         </Text>
                                     </HStack>
