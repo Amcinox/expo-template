@@ -22,7 +22,7 @@ const resources = {
 i18n.use(initReactI18next).init({
   compatibilityJSON: "v4",
   resources,
-  lng: getLocales()[0].languageCode || "en",
+  lng: getLocales()[0]?.languageCode || "en",
   fallbackLng: "en",
   interpolation: {
     escapeValue: false,
