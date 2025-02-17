@@ -9,8 +9,8 @@ import { Switch } from "@/components/ui/switch"
 import { Heading } from "@/components/ui/heading"
 import { Center } from "@/components/ui/center"
 import { Box } from "@/components/ui/box"
-import { useAuth } from '@/auth/AuthContext';
-import { useSettings } from '@/contexts/settingsContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSettings } from '@/contexts/SettingsContext';
 import { useTranslation } from 'react-i18next';
 import { RadioGroup, Radio, RadioIndicator, RadioLabel, RadioIcon } from "@/components/ui/radio"
 import { ScrollView } from 'react-native';

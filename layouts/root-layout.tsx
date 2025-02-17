@@ -1,6 +1,6 @@
-import { AuthProvider } from "@/auth/AuthContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
-import { useSettings } from "@/contexts/settingsContext";
+import { useSettings } from "@/contexts/SettingsContext";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { SplashScreen } from "expo-router";
@@ -29,7 +29,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
     return (
         <GluestackUIProvider mode="light">
-            <AuthProvider>
+            <AuthProvider config={
+                {
+                    biometric: {
+                        enabled: true,
+                    },
+                    authTimeout: {
+                        requireAuthAgain: false,
+                        authType: "logout",
+                        duration: 10000,
+                    }
+                }}>
                 {children}
             </AuthProvider>
         </GluestackUIProvider>

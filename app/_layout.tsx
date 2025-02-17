@@ -6,8 +6,8 @@ import * as SplashScreen from 'expo-splash-screen';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { ActivityIndicator, View } from 'react-native';
-import { useAuth } from '@/auth/AuthContext';
-import { SettingsProvider } from '@/contexts/settingsContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { SettingsProvider } from '@/contexts/SettingsContext';
 import RootLayout from '@/layouts/root-layout';
 
 

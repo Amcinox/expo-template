@@ -5,7 +5,7 @@ import { Heading } from "@/components/ui/heading"
 import { Text } from "@/components/ui/text"
 import { Center } from "@/components/ui/center"
 import { Box } from "@/components/ui/box"
-import { useAuth } from '@/auth/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import FormProvider from '@/components/hook-form/form-provider';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

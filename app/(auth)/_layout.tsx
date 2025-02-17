@@ -1,4 +1,4 @@
-import { useAuth } from '@/auth/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Redirect, Stack } from 'expo-router';
 
 export default function AuthLayout() {
