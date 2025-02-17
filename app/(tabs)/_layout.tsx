@@ -5,6 +5,7 @@ import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useClientOnlyValue } from '@/hooks/useClientOnlyValue';
 import { useAuth } from '@/auth/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -16,6 +17,7 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   if (!isAuthenticated) {
     return <Redirect href="/(auth)" />;
@@ -32,14 +34,14 @@ export default function TabLayout() {
 
       <Tabs.Screen name="tracking"
         options={{
-          title: 'Tracking',
+          title: t('Tracking'),
           tabBarIcon: ({ color }) => <TabBarIcon name="map-marker" color={color} />,
         }}
 
       />
       <Tabs.Screen name="wellbeing"
         options={{
-          title: 'Wellbeing',
+          title: t('Ressources'),
           tabBarIcon: ({ color }) => <TabBarIcon name="heartbeat" color={color} />,
         }}
       />
@@ -47,14 +49,14 @@ export default function TabLayout() {
 
 
         options={{
-          title: 'Home',
+          title: t('Home'),
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
         }}
         name="home"
       />
       <Tabs.Screen name="settings"
         options={{
-          title: 'Settings',
+          title: t('Settings'),
           tabBarIcon: ({ color }) => <TabBarIcon name="cog" color={color} />,
         }}
       />
