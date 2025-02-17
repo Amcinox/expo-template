@@ -1,5 +1,5 @@
-import "@/global.css";
 import "@/locales/i18n";
+import "@/global.css";
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Slot } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -41,7 +41,7 @@ function App() {
     )
   }
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={DefaultTheme}>
       <Slot />
     </ThemeProvider>
   );

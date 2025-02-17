@@ -132,7 +132,7 @@ const handlers: Record<string, (state: SettingsState, action: SettingsAction) =>
     },
 
     UPDATE_THEME: (state, action) => {
-        console.log({ newTheme: action.payload.theme })
+
         return {
             ...state,
             theme: action.payload.theme
