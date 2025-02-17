@@ -20,8 +20,10 @@ import { Text } from "@/components/ui/text";
 import { Card } from "@/components/ui/card";
 import { exampleFormSchema, ExamplePayload } from "@/schemas/example/example.schema";
 import RHFTextarea from "@/components/hook-form/rhf-textarea";
+import { useTranslation } from "react-i18next";
 
 export default function HomeScreen() {
+    const { t } = useTranslation();
     const form = useForm<ExamplePayload>({
         resolver: zodResolver(exampleFormSchema),
         defaultValues: {
@@ -46,24 +48,24 @@ export default function HomeScreen() {
                     <VStack className="space-y-6">
                         {/* Header */}
                         <Center className="mb-4">
-                            <Heading size="xl" className="text-gray-800">Example Screen</Heading>
-                            <Text className="text-sm text-gray-500 mt-1">Complete information</Text>
+                            <Heading size="xl" className="text-gray-800">{t("Example Screen")}</Heading>
+                            <Text className="text-sm text-gray-500 mt-1">{t("Complete information")}</Text>
                         </Center>
 
                         <FormProvider methods={form}>
                             <VStack className="space-y-6">
                                 <Box>
-                                    <Heading size="md" className="text-gray-700 mb-3">Personal Details</Heading>
+                                    <Heading size="md" className="text-gray-700 mb-3">{t("Personal Details")}</Heading>
                                     <VStack className="space-y-4">
                                         <RHFTextField
                                             name="name"
-                                            label="Full Name"
-                                            helperText="Enter your full name"
+                                            label={t("Full Name")}
+                                            helperText={t("Enter your full name")}
                                             className="w-full"
                                         />
 
                                         <RHFSelect
-                                            label="Country"
+                                            label={t("Country")}
                                             name="country"
                                             options={[
                                                 { value: "MA", label: "Morocco" },
@@ -75,7 +77,7 @@ export default function HomeScreen() {
 
                                             size="sm"
                                             name="bio"
-                                            label="Bio"
+                                            label={t("Bio")}
                                             placeholder="Tell us about yourself" />
                                     </VStack>
                                 </Box>
@@ -83,10 +85,10 @@ export default function HomeScreen() {
                                 <Divider className="my-4" />
 
                                 <Box>
-                                    <Heading size="md" className="text-gray-700 mb-3">Preferences</Heading>
+                                    <Heading size="md" className="text-gray-700 mb-3">{t("Preferences")}</Heading>
                                     <VStack className="space-y-4">
                                         <RHFRadioGroup
-                                            label="Preferred Language"
+                                            label={t("Preferred Language")}
                                             name="language"
                                             options={[
                                                 { value: "en", label: "English" },
@@ -98,13 +100,13 @@ export default function HomeScreen() {
                                             size="lg"
                                             orientation="horizontal"
                                             name="motivation"
-                                            label="Motivation Level"
+                                            label={t("Motivation Level")}
                                             className="my-2"
                                         />
 
                                         <RHFSwitch
                                             name="notification"
-                                            label="Enable Notifications"
+                                            label={t("Enable Notifications")}
                                         />
                                     </VStack>
                                 </Box>
@@ -115,8 +117,8 @@ export default function HomeScreen() {
                                 <Box className="bg-gray-50 p-4 rounded-lg">
                                     <RHFCheckbox
                                         name="terms"
-                                        label="Terms and Conditions"
-                                        checkboxLabel="I agree to the terms and conditions"
+                                        label={t("Terms and Conditions")}
+                                        checkboxLabel={t("I agree to the terms and conditions")}
                                     />
                                 </Box>
 
@@ -126,14 +128,14 @@ export default function HomeScreen() {
                                         variant="outline"
                                         onPress={() => form.reset()}
                                     >
-                                        <ButtonText>Reset</ButtonText>
+                                        <ButtonText>{t("Reset")}</ButtonText>
                                     </Button>
                                     <Button
                                         variant="solid"
                                         className="bg-blue-500 "
                                         onPress={form.handleSubmit((data) => console.log(data))}
                                     >
-                                        <ButtonText className="text-white">Save</ButtonText>
+                                        <ButtonText className="text-white">{t("Save")}</ButtonText>
                                     </Button>
                                 </HStack>
                             </VStack>
@@ -143,13 +145,13 @@ export default function HomeScreen() {
 
                 <Card className="p-4 bg-white rounded-lg shadow-md">
                     <VStack className="space-y-2">
-                        <Heading size="sm" className="text-gray-700">Current Values</Heading>
-                        <Text>Name: {watch("name")}</Text>
-                        <Text>Language: {watch("language")}</Text>
-                        <Text>Terms: {JSON.stringify(watch("terms"))}</Text>
-                        <Text>Country: {watch("country")}</Text>
-                        <Text>Motivation: {watch("motivation")}</Text>
-                        <Text>Notification: {JSON.stringify(watch("notification"))}</Text>
+                        <Heading size="sm" className="text-gray-700">{t("Current Values")}</Heading>
+                        <Text>{t("Name")}: {watch("name")}</Text>
+                        <Text>{t("Language")}: {watch("language")}</Text>
+                        <Text>{t("Terms")}: {JSON.stringify(watch("terms"))}</Text>
+                        <Text>{t("Country")}: {watch("country")}</Text>
+                        <Text>{t("Motivation")}: {watch("motivation")}</Text>
+                        <Text>{t("Notifications")}: {JSON.stringify(watch("notification"))}</Text>
                     </VStack>
                 </Card>
             </Box>

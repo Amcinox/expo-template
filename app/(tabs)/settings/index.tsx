@@ -1,9 +1,6 @@
-// app/(tabs)/settings.tsx
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { router } from 'expo-router';
 import { useToast } from "@/components/ui/toast";
-
-// Corrected Gluestack UI Imports from "@/components/ui/"
 import { VStack } from "@/components/ui/vstack"
 import { HStack } from "@/components/ui/hstack"
 import { Text } from "@/components/ui/text"
@@ -13,114 +10,233 @@ import { Heading } from "@/components/ui/heading"
 import { Center } from "@/components/ui/center"
 import { Box } from "@/components/ui/box"
 import { useAuth } from '@/auth/AuthContext';
+import { Languages, useSettings } from '@/contexts/settingsContext';
+import { useTranslation } from 'react-i18next';
+import { RadioGroup, Radio, RadioIndicator, RadioLabel, RadioIcon } from "@/components/ui/radio"
+import { ScrollView } from 'react-native';
+import _ from 'lodash';
+import { CircleIcon } from '@/components/ui/icon';
+
+
 
 const SettingsScreen = () => {
     const { logout, isBiometricEnabled, enableBiometric, disableBiometric, isLoading, user } = useAuth();
     const toast = useToast();
+    const { updateLanguage, language, updatePermission, device, networkState, permissions } = useSettings();
+    const { t, i18n } = useTranslation();
 
-    const handleLogout = async () => {
-        try {
-            await logout();
-            router.replace("/(auth)/login"); // Redirect to login screen after logout
-        } catch (error) {
-            console.error("Error during logout:", error);
-        }
+    useEffect(() => {
+        updatePermission("camera", true);
+    }, [updatePermission]);
+
+    const languageHandler = (language: Languages) => {
+        i18n.changeLanguage(language);
+        updateLanguage(language);
     };
 
     const handleBiometricToggle = useCallback(async (value: boolean) => {
         if (value) {
             try {
-                await enableBiometric("Mokamoka++-1");
+                await enableBiometric();
             } catch (error) {
                 console.error("Error enabling biometric:", error);
-                toast.show({ /* ... toast code ... */ });
+                toast.show({});
             }
         } else {
             try {
                 await disableBiometric();
             } catch (error) {
                 console.error("Error disabling biometric:", error);
-                toast.show({ /* ... toast code ... */ });
+                toast.show({});
             }
         }
     }, [disableBiometric, enableBiometric, toast]);
 
     return (
-        <Center className="p-4 bg-white">
-            <Box className="max-w-96 w-full">
-                <Heading size="xl" className="mb-6">
-                    Settings
-                </Heading>
-                <Text>
-                    {JSON.stringify(user)}
-                </Text>
-                <VStack space="xl">
-                    <HStack>
-                        <Text className="text-lg font-semibold text-gray-700">Enable Biometric Login</Text>
-                        <Switch
-                            isDisabled={isLoading}
-                            value={isBiometricEnabled}
-                            onValueChange={handleBiometricToggle}
-                        />
-                    </HStack>
+        <ScrollView className="bg-gray-50">
+            <Center className="p-4">
+                <Box className="w-full max-w-md">
+                    <VStack className="space-y-6" space="lg">
+                        <Box className="bg-white rounded-xl p-4 shadow-sm">
+                            <Heading size="xl" className="text-gray-800">
+                                {t('Settings')}
+                            </Heading>
+                        </Box>
 
-                    <Button
-                        collapsable
+                        <Box className="bg-white rounded-xl p-4 shadow-sm">
+                            <Heading size="sm" className="text-gray-700 mb-4">
+                                {t('Language')}
+                            </Heading>
 
-                        variant="solid"
-                        onPress={handleLogout}
+                            <RadioGroup value={language} onChange={(value) => languageHandler(value)}>
+                                {Object.keys(Languages).map((key) => (
+                                    <Radio
+                                        key={key}
+                                        value={Languages[key as keyof typeof Languages]}
+                                        size="md"
+                                        isInvalid={false}
+                                        isDisabled={false}
+                                    >
+                                        <RadioIndicator>
+                                            <RadioIcon as={CircleIcon} />
+                                        </RadioIndicator>
+                                        <RadioLabel>{Languages[key as keyof typeof Languages]}</RadioLabel>
+                                    </Radio>
+                                ))}
+                            </RadioGroup>
+                        </Box>
+                        <Box className="bg-white rounded-xl p-4 shadow-sm">
+                            <Heading size="sm" className="text-gray-700 mb-4">
+                                {t('Security')}
+                            </Heading>
+                            <VStack className="space-y-4" space="lg">
+                                <HStack className="justify-between items-center">
+                                    <Text className="text-gray-700">{t('Biometric Login')}</Text>
+                                    <Switch
+                                        isDisabled={isLoading}
+                                        value={isBiometricEnabled}
+                                        onValueChange={handleBiometricToggle}
+                                    />
+                                </HStack>
+                                <Button
+                                    variant="link"
+                                    onPress={() => router.push("/settings/change-password")}
+                                    className="bg-blue-500 rounded-lg py-2.5"
+                                >
+                                    <ButtonText className="text-white">
+                                        {t('Change Password')}
+                                    </ButtonText>
+                                </Button>
+                                <Button
+                                    variant="link"
+                                    onPress={() => router.push("/settings/biometric")}
+                                    className="bg-blue-500 rounded-lg py-2.5"
+                                >
+                                    <ButtonText className="text-white">
+                                        {t('Biometric Settings')}
+                                    </ButtonText>
+                                </Button>
+                            </VStack>
+                        </Box>
 
-                    >
-                        <ButtonText>Logout</ButtonText>
-                    </Button>
+                        <Box className="bg-white rounded-xl p-4 shadow-sm">
+                            <Heading size="sm" className="text-gray-700 mb-4">
+                                {t('Profile Information')}
+                            </Heading>
+                            <VStack className="space-y-3" space="sm">
+                                <Button
+                                    variant="link"
+                                    onPress={() => router.push("/settings/basic-information")}
+                                    className="bg-gray-100 rounded-lg py-2.5"
+                                >
+                                    <ButtonText className="text-gray-700">
+                                        {t('Basic Information')}
+                                    </ButtonText>
+                                </Button>
+                                <Button
+                                    variant="link"
+                                    onPress={() => router.push("/settings/employer-information")}
+                                    className="bg-gray-100 rounded-lg py-2.5"
+                                >
+                                    <ButtonText className="text-gray-700">
+                                        {t('Employer Information')}
+                                    </ButtonText>
+                                </Button>
+                                <Button
+                                    variant="link"
+                                    onPress={() => router.push("/settings/bank-information")}
+                                    className="bg-gray-100 rounded-lg py-2.5"
+                                >
+                                    <ButtonText className="text-gray-700">
+                                        {t('Bank Information')}
+                                    </ButtonText>
+                                </Button>
+                            </VStack>
+                        </Box>
 
-                    <Button
-                        variant="link"
-                        onPress={() => router.push("/settings/bank-information")}
-
-                        className="rounded-md bg-green-500 hover:bg-green-600 py-2 mt-4"
-                    >
-                        <ButtonText className="text-white font-semibold">Bank Informations</ButtonText>
-                    </Button>
-
-                    <Button
-                        variant="link"
-                        onPress={() => router.push("/settings/basic-information")}
-                        className="rounded-md bg-green-500 hover:bg-green-600 py-2 mt-4"
-                    >
-                        <ButtonText className="text-white font-semibold">Basic Informations</ButtonText>
-                    </Button>
 
 
-                    <Button
-                        variant="link"
-                        onPress={() => router.push("/settings/biometric")}
+                        <Box className="bg-white rounded-xl p-4 shadow-sm">
+                            <Heading size="sm" className="text-gray-700 mb-4">
+                                {t('Device')}
+                            </Heading>
+                            <VStack className="space-y-3" space="sm">
 
-                        className="rounded-md bg-green-500 hover:bg-green-600 py-2 mt-4"
-                    >
-                        <ButtonText className="text-white font-semibold">Biometric</ButtonText>
-                    </Button>
+                                {device && Object.keys(device).map((key) => (
+                                    <HStack key={key} className="justify-between items-center">
+                                        <Text className="text-gray-700">{_.startCase(key)}</Text>
+                                        <Text className="text-gray-700">
+                                            {typeof device[key as keyof typeof device] === 'boolean' ? device[key as keyof typeof device] ? 'Yes' : 'No' : device[key as keyof typeof device]}
+                                        </Text>
+                                    </HStack>
+                                ))}
+                            </VStack>
+                        </Box>
 
 
-                    <Button
-                        variant="link"
-                        onPress={() => router.push("/settings/change-password")}
+                        <Box className="bg-white rounded-xl p-4 shadow-sm">
+                            <Heading size="sm" className="text-gray-700 mb-4">
+                                {t('Network State')}
+                            </Heading>
+                            <VStack className="space-y-3" space="sm">
 
-                        className="rounded-md bg-green-500 hover:bg-green-600 py-2 mt-4"
-                    >
-                        <ButtonText className="text-white font-semibold">Change Password</ButtonText>
-                    </Button>
+                                {networkState && Object.keys(networkState).map((key) => (
+                                    <HStack key={key} className="justify-between items-center">
+                                        <Text className="text-gray-700">{_.startCase(key)}</Text>
+                                        <Text className="text-gray-700">
+                                            {typeof networkState[key as keyof typeof device] === 'boolean' ? networkState[key as keyof typeof device] ? 'Yes' : 'No' : networkState[key as keyof typeof device]}
+                                        </Text>
+                                    </HStack>
+                                ))}
+                            </VStack>
+                        </Box>
 
-                    <Button
-                        variant="link"
-                        onPress={() => router.push("/settings/employer-information")}
-                        className="rounded-md bg-green-500 hover:bg-green-600 py-2 mt-4"
-                    >
-                        <ButtonText className="text-white font-semibold">Employer Information</ButtonText>
-                    </Button>
-                </VStack>
-            </Box>
-        </Center >
+
+
+                        {/* //permission box */}
+                        <Box className="bg-white rounded-xl p-4 shadow-sm">
+                            <Heading size="sm" className="text-gray-700 mb-4">
+                                {t('Permissions')}
+                            </Heading>
+                            <VStack className="space-y-3" space="sm">
+
+                                {permissions && Object.keys(permissions).map((key) => (
+                                    <HStack key={key} className="justify-between items-center">
+                                        <Text className="text-gray-700">{_.startCase(key)}</Text>
+                                        <Text className="text-gray-700">
+                                            {key === 'biometric' ? (
+                                                permissions[key as keyof typeof permissions] ? (
+                                                    `Enrolled: ${(permissions[key as keyof typeof permissions] as any)?.isEnrolled ? 'Yes' : 'No'}, Hardware: ${(permissions[key as keyof typeof permissions] as any)?.hasHardware ? 'Yes' : 'No'}`
+                                                ) : 'Not Available'
+                                            ) : typeof permissions[key as keyof typeof permissions] === 'boolean' ? (
+                                                permissions[key as keyof typeof permissions] ? 'Yes' : 'No'
+                                            ) : (
+                                                String(permissions[key as keyof typeof permissions])
+                                            )}
+                                        </Text>
+                                    </HStack>
+                                ))}
+                            </VStack>
+                        </Box>
+
+
+
+
+                        <Box className="bg-white rounded-xl p-4 shadow-sm">
+                            <Button
+                                variant="solid"
+                                onPress={async () => await logout()}
+                                className="bg-red-500 rounded-lg py-2.5 w-full"
+                            >
+                                <ButtonText className="text-white font-medium">
+                                    {t('Logout')}
+                                </ButtonText>
+                            </Button>
+                        </Box>
+                    </VStack>
+                </Box>
+            </Center>
+        </ScrollView>
     );
 };
 

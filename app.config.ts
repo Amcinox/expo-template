@@ -91,16 +91,64 @@ export default ({ config }: ConfigContext): ExpoConfig => {
                 {
                     "faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID."
                 }
-            ]
+            ],
+            "expo-localization",
+
+
+            // *** If Camera enabled in Settings, add the following plugin *** //
+            // [
+            //     "expo-camera",
+            //     {
+            //         "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+            //         "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+            //         "recordAudioAndroid": true
+            //     }
+            // ]
+
+
+            // *** if Location enabled in Settings, add the following plugin *** //
+            // [
+            //     "expo-location",
+            //     {
+            //         "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+            //     }
+            // ]
+
+
+            // *** if mediaLibrary enabled in Settings, add the following plugin *** //
+            // [
+            //     "expo-media-library",
+            //     {
+            //         "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
+            //         "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
+            //         "isAccessMediaLocationEnabled": true
+            //     }
+            // ]
+
+
+            // *** if Audio/Microphone enabled in Settings, add the following plugin *** //
+            // [
+            //     "expo-audio",
+            //     {
+            //         "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+            //     }
+            // ]
+
+            // *** if Contact enabled in Settings, add the following plugin *** //
+            // [
+            //     "expo-contacts",
+            //     {
+            //         "contactsPermission": "Allow $(PRODUCT_NAME) to access your contacts."
+            //     }
+            // ]
         ],
         newArchEnabled: true,
         experiments: {
             typedRoutes: true,
-
         },
         extra: {
             eas: {
-                "projectId": ""
+                projectId: process.env.EAS_PROJECT_ID,
             },
             APP_ENV: process.env.APP_ENV,
             API_URL: process.env.API_URL,
