@@ -14,6 +14,7 @@
         "@gluestack-ui/form-control": "^0.1.19",
         "@gluestack-ui/icon": "^0.1.25",
         "@gluestack-ui/input": "^0.1.32",
+        "@gluestack-ui/modal": "^0.1.35",
         "@gluestack-ui/nativewind-utils": "^1.0.26",
         "@gluestack-ui/overlay": "^0.1.16",
         "@gluestack-ui/pressable": "^0.1.17",
@@ -424,6 +425,8 @@
     "@gluestack-ui/icon": ["@gluestack-ui/icon@0.1.25", "", { "dependencies": { "@gluestack-ui/provider": "^0.1.13", "@gluestack-ui/utils": "^0.1.14", "@react-native-aria/focus": "^0.2.9" }, "peerDependencies": { "react": ">=16", "react-dom": ">=16" } }, "sha512-HCyiHHHZzHpP5MIy5F2hP8iBc+0yt2NNM+jhbPYeoRG4WY7wc1whaUs9EIQvj880cq/zxOQP0Bz4mnyhuKsEKQ=="],
 
     "@gluestack-ui/input": ["@gluestack-ui/input@0.1.32", "", { "dependencies": { "@gluestack-ui/form-control": "^0.1.19", "@gluestack-ui/utils": "^0.1.14", "@react-native-aria/focus": "^0.2.9", "@react-native-aria/interactions": "0.2.13" }, "peerDependencies": { "react": ">=16", "react-dom": ">=16" } }, "sha512-RWtqpo0p37GYjwBTiMf4fpvKYe32OMa6lxFbDqPqEX1m994D9QwP7iWnDWA/9nr/Mf3eET6dMWbH4/eL4oZr8Q=="],
+
+    "@gluestack-ui/modal": ["@gluestack-ui/modal@0.1.35", "", { "dependencies": { "@gluestack-ui/hooks": "0.1.12", "@gluestack-ui/overlay": "^0.1.16", "@gluestack-ui/utils": "^0.1.14", "@react-native-aria/dialog": "^0.0.4", "@react-native-aria/focus": "^0.2.9", "@react-native-aria/interactions": "0.2.13", "@react-native-aria/overlays": "^0.3.12" }, "peerDependencies": { "react": ">=16", "react-dom": ">=16" } }, "sha512-KfA2aJ/ZsdM5rggAAJOykVHsOZf7aYjTfDNsd5JHUC7Uo8IrQAZJBX1DEz+Y3V8dPMXEIlEFGMaVh4o29nZXcw=="],
 
     "@gluestack-ui/nativewind-utils": ["@gluestack-ui/nativewind-utils@1.0.26", "", { "dependencies": { "find-yarn-workspace-root": "^2.0.0", "patch-package": "8.0.0", "tailwind-variants": "0.1.20" }, "peerDependencies": { "nativewind": ">=4.0", "react": ">=16" } }, "sha512-Ul/nHkYOKMH5CTmDUndM826GKYqWI6jFaz7/v7AgOo9dFuokOYm6Sd3pcJHqzPghwODRXV9L4nQgxa7dJX96pg=="],
 

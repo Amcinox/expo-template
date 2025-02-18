@@ -54,17 +54,17 @@ const SettingsScreen = () => {
     }, [disableBiometric, enableBiometric, toast]);
 
     return (
-        <ScrollView className="bg-[--background-50]">
+        <ScrollView className="bg-background-50">
             <Center className="p-4">
                 <Box className="w-full max-w-md ">
                     <VStack className="space-y-6" space="lg">
-                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
+                        <Box className="bg-background-700 rounded-xl p-4 shadow-sm">
                             <Heading size="xl" >
                                 {t('Settings')}
                             </Heading>
                         </Box>
 
-                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
+                        <Box className="bg-background-700 rounded-xl p-4 shadow-sm">
                             <Heading size="sm" className=" mb-4">
                                 {t('Language')}
                             </Heading>
@@ -88,7 +88,7 @@ const SettingsScreen = () => {
                         </Box>
 
                         {/* Theme */}
-                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
+                        <Box className="bg-background-700 rounded-xl p-4 shadow-sm">
                             <Heading size="sm" className=" mb-4">
                                 {t('Themes')}
 
@@ -110,7 +110,7 @@ const SettingsScreen = () => {
                                 ))}
                             </VStack>
                         </Box>
-                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
+                        <Box className="bg-background-700 rounded-xl p-4 shadow-sm">
                             <Heading size="sm" className="mb-4">
                                 {t('Security')}
                             </Heading>
@@ -145,7 +145,7 @@ const SettingsScreen = () => {
                             </VStack>
                         </Box>
 
-                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
+                        <Box className="bg-background-700 rounded-xl p-4 shadow-sm">
                             <Heading size="sm" className="text-gray-700 mb-4">
                                 {t('Profile Information')}
                             </Heading>
@@ -182,7 +182,7 @@ const SettingsScreen = () => {
 
 
 
-                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
+                        <Box className="bg-background-700 rounded-xl p-4 shadow-sm">
                             <Heading size="sm" className="text-gray-700 mb-4">
                                 {t('Device')}
                             </Heading>
@@ -200,7 +200,7 @@ const SettingsScreen = () => {
                         </Box>
 
 
-                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
+                        <Box className="bg-background-700 rounded-xl p-4 shadow-sm">
                             <Heading size="sm" className="text-gray-700 mb-4">
                                 {t('Network State')}
                             </Heading>
@@ -220,7 +220,7 @@ const SettingsScreen = () => {
 
 
                         {/* //permission box */}
-                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
+                        <Box className="bg-background-700 rounded-xl p-4 shadow-sm">
                             <Heading size="sm" className="text-gray-700 mb-4">
                                 {t('Permissions')}
                             </Heading>
@@ -248,7 +248,7 @@ const SettingsScreen = () => {
 
 
 
-                        <Box className="bg-[--background-700] rounded-xl p-4 shadow-sm">
+                        <Box className="bg-background-700 rounded-xl p-4 shadow-sm">
                             <Button
                                 variant="solid"
                                 onPress={async () => await logout()}
