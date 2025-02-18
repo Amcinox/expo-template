@@ -5,7 +5,7 @@ import { OverlayProvider } from '@gluestack-ui/overlay';
 import { ToastProvider } from '@gluestack-ui/toast';
 import { colorScheme as colorSchemeNW, vars } from 'nativewind';
 import { useSettings } from '@/contexts/SettingsContext';
-import { generateColorPalette } from '@/utils/colors';
+import { convertColorsToTheme } from '@/utils/colors';
 
 type ModeType = 'light' | 'dark' | 'system';
 
@@ -32,14 +32,13 @@ export function GluestackUIProvider({
   const colorSchemeName = getColorSchemeName(colorScheme, mode);
   const { theme } = useSettings()
 
-
-
-  const colors = generateColorPalette(theme)
-
+  colorSchemeNW.set(mode);
+  const colors = convertColorsToTheme(theme)
   return (
     <View
       style={[
         vars(colors),
+        // config[colorSchemeName],
         // eslint-disable-next-line react-native/no-inline-styles
         { flex: 1, height: '100%', width: '100%' },
         props.style,

@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     }
 
     return (
-        <GluestackUIProvider mode="light">
+        <GluestackUIProvider mode="system">
             <AuthProvider config={
                 {
                     biometric: {
