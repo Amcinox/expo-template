@@ -59,6 +59,7 @@ export enum Languages {
     FR = "fr",
     JA = "ja",
     ES = "es",
+    AR = "ar"
 
 }
 

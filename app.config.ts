@@ -148,7 +148,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         },
         extra: {
             eas: {
-                projectId: process.env.EAS_PROJECT_ID,
+                projectId: "fad8d239-1f43-4ff9-9567-bc7beca0c6e1",
             },
             APP_ENV: process.env.APP_ENV,
             API_URL: process.env.API_URL,
