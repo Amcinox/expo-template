@@ -1,16 +1,19 @@
 import React from "react";
 import { Controller, useFormContext } from 'react-hook-form';
 import { FormControl, FormControlLabel, FormControlLabelText, FormControlHelper, FormControlHelperText, FormControlError, FormControlErrorText } from "../ui/form-control";
-import { Input, InputField, } from "../ui/input";
+import { Input, InputField, InputIcon, InputSlot, } from "../ui/input";
 
 
 
 interface RHFTextFieldProps extends React.ComponentProps<typeof Input> {
     name: string;
-    helperText?: string;
+    helperText?: string | React.ReactNode;
     label?: string;
     type?: React.ComponentProps<typeof InputField>["type"] | "number";
     placeholder?: React.ComponentProps<typeof InputField>["placeholder"];
+    leftIcon?: React.ReactNode
+    rightIcon?: React.ReactNode
+    formProps?: React.ComponentProps<typeof FormControl>
 }
 
 export default function RHFTextField({
@@ -23,7 +26,11 @@ export default function RHFTextField({
     isReadOnly = false,
     placeholder,
     variant = "outline",
+    leftIcon,
+    rightIcon,
+
     size,
+    formProps,
     ...other
 }: RHFTextFieldProps) {
     const { control } = useFormContext();
@@ -41,6 +48,7 @@ export default function RHFTextField({
                         isRequired={isRequired}
                         isDisabled={isDisabled}
                         isReadOnly={isReadOnly}
+                        {...formProps}
                     >
                         {label && (
                             <FormControlLabel>
@@ -48,6 +56,7 @@ export default function RHFTextField({
                             </FormControlLabel>
                         )}
                         <Input variant={variant} size={size} isInvalid={showError} {...other}>
+                            {leftIcon}
                             <InputField
                                 {...field}
                                 placeholder={placeholder}
@@ -66,6 +75,7 @@ export default function RHFTextField({
                                     }
                                 }}
                             />
+                            {rightIcon}
                         </Input>
                         {helperText && !showError && (
                             <FormControlHelper>
