@@ -15,19 +15,19 @@ const envConfig: Record<Environment, EnvironmentConfig> = {
         bundleId: 'com.remirage.dev',
         packageName: 'com.remiragedev',
         appName: 'Remirage - DEV',
-        icon: "./assets/images/icon.png",
+        icon: "./src/assets/images/icon.png",
     },
     stg: {
         bundleId: 'com.remirage.stg',
         packageName: 'com.remiragestg',
         appName: 'Remirage - STG',
-        icon: "./assets/images/icon.png",
+        icon: "./src/assets/images/icon.png",
     },
     prod: {
         bundleId: 'com.remirage',
         packageName: 'com.remirage',
         appName: 'Remirage',
-        icon: "./assets/images/icon.png",
+        icon: "./src/assets/images/icon.png",
     },
 };
 const generateDateBasedBuildNumber = (): string => {
@@ -54,11 +54,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         slug: "remirage",
         version: "1.0.0",
         orientation: "portrait",
-        icon: icon || "./assets/images/icon.png",
+        icon: icon || "./src/assets/images/icon.png",
         scheme: "myapp",
         userInterfaceStyle: "automatic",
         splash: {
-            image: "./assets/images/splash.png",
+            image: "./src/assets/images/splash.png",
             resizeMode: "contain",
             backgroundColor: "#ffffff"
         },
@@ -73,14 +73,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
             package: packageName,
             versionCode: dateBuildNumber ? parseInt(dateBuildNumber) : 1,
             adaptiveIcon: {
-                foregroundImage: "./assets/images/adaptive-icon.png",
+                foregroundImage: "./src/assets/images/adaptive-icon.png",
                 backgroundColor: "#ffffff"
             }
         },
         web: {
             bundler: "metro",
             output: "static",
-            favicon: "./assets/images/favicon.png"
+            favicon: "./src/assets/images/favicon.png"
         },
         plugins: [
             "expo-router",
