@@ -334,11 +334,19 @@ export function AuthProvider({ children, config }: AuthProviderProps) {
         dispatch({ type: AuthActionTypeEnum.SET_IS_LOADING, payload: true });
 
         try {
-            const { data } = await apiHandler.fetch<LoginResponse, any>({
-                endpoint: endpoints.auth.login.path({}),
-                method: endpoints.auth.login.method,
-                body: { username, password },
-            });
+            // const { data } = await apiHandler.fetch<LoginResponse, any>({
+            //     endpoint: endpoints.auth.login.path({}),
+            //     method: endpoints.auth.login.method,
+            //     body: { username, password },
+            // });
+
+            const data = {
+                AuthenticationResult: {
+                    RefreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30",
+                    IdToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30",
+                    AccessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30"
+                }
+            }
 
             const { RefreshToken: refreshToken, IdToken: idToken, AccessToken: returnedAccessToken } = data.AuthenticationResult;
             if (refreshToken && idToken && returnedAccessToken) {

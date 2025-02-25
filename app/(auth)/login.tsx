@@ -20,8 +20,8 @@ const LoginScreen = () => {
     const form = useForm<LoginPayload>({
         resolver: zodResolver(LoginSchema),
         defaultValues: {
-            username: "",
-            password: "",
+            username: "demo@elbssir.com",
+            password: "123456",
         },
     });
 
