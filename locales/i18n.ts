@@ -1,6 +1,6 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import { en, fr, ja, es } from "./translations";
+import { en, fr, ja, es, ar } from "./translations";
 import { getLocales } from "expo-localization";
 
 
@@ -16,7 +16,10 @@ const resources = {
   },
   es: {
     translation: es,
-  }
+  },
+  ar: {
+    translation: ar,
+  },
 };
 
 i18n.use(initReactI18next).init({

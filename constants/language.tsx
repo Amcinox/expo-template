@@ -26,4 +26,9 @@ export const languagesList: Language[] = [
         value: Languages.ES,
         flag: '🇪🇸'
     },
+    {
+        title: 'Arabic',
+        value: Languages.AR,
+        flag: '🇲🇦'
+    }
 ];
