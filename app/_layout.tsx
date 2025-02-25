@@ -7,8 +7,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { ActivityIndicator, View } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
-import { SettingsProvider } from '@/contexts/SettingsContext';
 import RootLayout from '@/layouts/root-layout';
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { SettingsProvider } from "@/contexts/SettingsContext";
 
 
 export {
@@ -19,11 +20,13 @@ SplashScreen.preventAutoHideAsync();
 
 export default function SettingsLayout() {
   return (
-    <SettingsProvider>
-      <RootLayout>
-        <App />
-      </RootLayout>
-    </SettingsProvider>
+    <ErrorBoundary>
+      <SettingsProvider>
+        <RootLayout>
+          <App />
+        </RootLayout>
+      </SettingsProvider>
+    </ErrorBoundary>
   );
 }
 
