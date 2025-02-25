@@ -9,6 +9,7 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { AuthenticationType, hasHardwareAsync, supportedAuthenticationTypesAsync } from 'expo-local-authentication';
 import { DeviceDetails, Languages, Theme, Permissions } from '@/types/settings';
+import SplashLoading from '@/components/SplashLoading';
 
 
 
@@ -26,6 +27,7 @@ export interface SettingsState {
     permissions: Permissions
     device: DeviceDetails | null;
     networkState: NetworkState | null
+    showSplashLoading: boolean
 }
 
 
@@ -73,6 +75,8 @@ const initialState: SettingsState = {
     },
     device: null,
     networkState: null,
+    showSplashLoading: false
+
 
 };
 
@@ -89,6 +93,7 @@ enum SettingsActionType {
     UPDATE_NETWORK_STATE = "UPDATE_NETWORK_STATE",
     UPDATE_INITIAL_PERMISSIONS = "UPDATE_INITIAL_PERMISSIONS",
     UPDATE_BIOMETRIC_PERMISSION = "UPDATE_BIOMETRIC_PERMISSION",
+    TOGGLE_SPLASH_LOADING = "TOGGLE_SPLASH_LOADING",
 }
 
 type SettingsAction =
@@ -102,7 +107,8 @@ type SettingsAction =
     | { type: SettingsActionType.UPDATE_DEVICE_INFO; payload: { device: DeviceDetails | null } }
     | { type: SettingsActionType.UPDATE_INITIAL_PERMISSIONS; payload: { permissions: Permissions } }
     | { type: SettingsActionType.UPDATE_NETWORK_STATE; payload: { networkState: NetworkState } }
-    | { type: SettingsActionType.UPDATE_BIOMETRIC_PERMISSION; payload: { hasHardware: boolean; availableAuthenticators: AuthenticationType[]; isEnrolled: boolean } };
+    | { type: SettingsActionType.UPDATE_BIOMETRIC_PERMISSION; payload: { hasHardware: boolean; availableAuthenticators: AuthenticationType[]; isEnrolled: boolean } }
+    | { type: SettingsActionType.TOGGLE_SPLASH_LOADING; payload: { showSplashLoading: boolean } };
 
 
 const handlers: Record<string, (state: SettingsState, action: SettingsAction) => SettingsState> = {
@@ -198,6 +204,10 @@ const handlers: Record<string, (state: SettingsState, action: SettingsAction) =>
         },
     }),
 
+    TOGGLE_SPLASH_LOADING: (state, action) => ({
+        ...state,
+        showSplashLoading: action.payload.showSplashLoading,
+    }),
 
 };
 
@@ -213,6 +223,8 @@ interface SettingsContextProps extends SettingsState {
     updateLanguage: (language: Languages) => Promise<void>;
     updateWalkThrough: (walkThrough: boolean) => Promise<void>;
     updateTheme: (theme: Theme) => Promise<void>;
+    toggleSplashLoading: (showSplashLoading: boolean) => Promise<void>;
+
 
 
 }
@@ -223,6 +235,7 @@ export const SettingsContext = createContext<SettingsContextProps>({
     updateLanguage: () => Promise.resolve(),
     updateWalkThrough: () => Promise.resolve(),
     updateTheme: () => Promise.resolve(),
+    toggleSplashLoading: () => Promise.resolve(),
 });
 
 // ----------------------------------------------------------------------
@@ -456,6 +469,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         })
     }, []);
 
+
     // Update Language if user changes language
     const updateLanguage = useCallback(async (language: Languages) => {
         try {
@@ -494,6 +508,16 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     }, []);
 
 
+
+
+    const toggleSplashLoading = useCallback(async (showSplashLoading: boolean) => {
+        dispatch({
+            type: SettingsActionType.TOGGLE_SPLASH_LOADING,
+            payload: { showSplashLoading },
+        });
+
+    }, []);
+
     return (
         <SettingsContext.Provider
             value={{
@@ -502,10 +526,13 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 updateColorScheme,
                 updateLanguage,
                 updateWalkThrough,
-                updateTheme
+                updateTheme,
+                toggleSplashLoading
             }}
         >
             {children}
+
+            <SplashLoading theme={state.theme} show={state.showSplashLoading} />
         </SettingsContext.Provider>
     );
 }
