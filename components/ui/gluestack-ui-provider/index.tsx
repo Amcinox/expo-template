@@ -1,5 +1,4 @@
-import React from 'react';
-import { config } from './config';
+import React, { useMemo } from 'react';
 import { ColorSchemeName, useColorScheme, View, ViewProps } from 'react-native';
 import { OverlayProvider } from '@gluestack-ui/overlay';
 import { ToastProvider } from '@gluestack-ui/toast';
@@ -33,7 +32,8 @@ export function GluestackUIProvider({
   const { theme } = useSettings()
 
   colorSchemeNW.set(mode);
-  const colors = convertColorsToTheme(theme)
+  const colors = useMemo(() => convertColorsToTheme(theme), [theme]);
+
   return (
     <View
       style={[
