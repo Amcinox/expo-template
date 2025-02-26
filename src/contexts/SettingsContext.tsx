@@ -27,7 +27,12 @@ export interface SettingsState {
     permissions: Permissions
     device: DeviceDetails | null;
     networkState: NetworkState | null
-    showSplashLoading: boolean
+    showSplashLoading: boolean,
+    appConfig: {
+        minVersion: string;
+        currentVersion: string;
+        maintenance: boolean;
+    };
 }
 
 
@@ -75,7 +80,13 @@ const initialState: SettingsState = {
     },
     device: null,
     networkState: null,
-    showSplashLoading: false
+    showSplashLoading: false,
+    appConfig: {
+        minVersion: "1.0.0",
+        currentVersion: "1.0.0",
+        maintenance: false,
+    },
+
 
 
 };
