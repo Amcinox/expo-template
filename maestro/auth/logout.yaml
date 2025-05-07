@@ -1,0 +1,8 @@
+appId: com.remirage.dev
+---
+- tapOn:
+      id: "tab-profile"
+- tapOn:
+      id: "logout-button"
+- assertVisible:
+      id: "login-button"

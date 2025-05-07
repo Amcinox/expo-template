@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "108863395078",
+    "project_id": "advancia-45aed",
+    "storage_bucket": "advancia-45aed.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:108863395078:android:880067af88dfcaea22fa87",
+        "android_client_info": {
+          "package_name": "com.egaliti.advanciastgexpo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNDCgBSWdWfKGjxjbebG3UbCjZxuCNiwo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

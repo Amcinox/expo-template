@@ -1,0 +1,72 @@
+name: Build iOS and Android
+
+on:
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: "Environment to build for"
+                required: true
+                default: "dev"
+                type: choice
+                options:
+                    - dev
+                    - stg
+                    - prod
+
+jobs:
+    build-all:
+        runs-on: ubuntu-latest
+        steps:
+            - name: 📚 Checkout code
+              uses: actions/checkout@v3
+
+            - name: 🏗 Setup Node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18.x
+
+            - name: 📦 Install dependencies
+              run: yarn install
+
+            - name: 🔍 Set environment variables
+              id: env_vars
+              run: |
+                  if [[ "${{ github.event.inputs.environment }}" == "dev" ]]; then
+                    echo "APP_ENV=dev" >> $GITHUB_OUTPUT
+                    echo "EAS_PROFILE=development" >> $GITHUB_OUTPUT
+                    echo "ANDROID_TRACK=internal" >> $GITHUB_OUTPUT
+                  elif [[ "${{ github.event.inputs.environment }}" == "stg" ]]; then
+                    echo "APP_ENV=stg" >> $GITHUB_OUTPUT
+                    echo "EAS_PROFILE=preview" >> $GITHUB_OUTPUT
+                    echo "ANDROID_TRACK=internal" >> $GITHUB_OUTPUT
+                  elif [[ "${{ github.event.inputs.environment }}" == "prod" ]]; then
+                    echo "APP_ENV=prod" >> $GITHUB_OUTPUT
+                    echo "EAS_PROFILE=production" >> $GITHUB_OUTPUT
+                    echo "ANDROID_TRACK=production" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Install EAS CLI
+              run: npm install -g eas-cli@15.0.15
+
+            - name: 🚀 Build iOS
+              env:
+                  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+                  APP_ENV: ${{ steps.env_vars.outputs.APP_ENV }}
+                  EAS_PROFILE: ${{ steps.env_vars.outputs.EAS_PROFILE }}
+                  APPLE_ID: ${{ secrets.APPLE_ID }}
+                  ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
+                  APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+                  EAS_PROJECT_ID: ${{ secrets.EAS_PROJECT_ID }}
+                  APP_VERSION: ${{ github.run_number }}
+                  BUILD_NUMBER: ${{ github.run_number }}
+              run: eas build --platform ios --profile $EAS_PROFILE --non-interactive
+
+            - name: 🤖 Build Android
+              env:
+                  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+                  APP_ENV: ${{ steps.env_vars.outputs.APP_ENV }}
+                  EAS_PROFILE: ${{ steps.env_vars.outputs.EAS_PROFILE }}
+                  EAS_PROJECT_ID: ${{ secrets.EAS_PROJECT_ID }}
+                  APP_VERSION: ${{ github.run_number }}
+                  BUILD_NUMBER: ${{ github.run_number }}
+              run: eas build --platform android --profile $EAS_PROFILE --non-interactive

@@ -1,0 +1,40 @@
+appId: com.remirage.dev
+---
+- launchApp:
+      clearState: true
+- runFlow:
+      when:
+          visible:
+              text: "http.*"
+      commands:
+          - tapOn: "http.*"
+- runFlow:
+      when:
+          visible: "Continue"
+      commands:
+          - tapOn: "Continue"
+- runFlow:
+      when:
+          visible: "Toggle performance monitor"
+      commands:
+          - tapOn:
+                point: 50%,10%
+
+- runFlow:
+      when:
+          notVisible:
+              id: "landing-screen"
+      commands:
+          - runFlow: "./auth/logout.yaml"
+- runFlow:
+      env:
+          USERNAME: "mohamed.elbssir@bareed.ws"
+          PASSWORD: "Mokamoka++-1"
+      when:
+          visible:
+              id: "landing-screen"
+      commands:
+          - runFlow: "./auth/login.yaml"
+          - runFlow: "./profile/support.yaml"
+          - runFlow: "./profile/profile.yaml"
+          - runFlow: "./auth/logout.yaml"

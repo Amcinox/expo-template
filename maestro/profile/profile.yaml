@@ -1,0 +1,6 @@
+appId: com.remirage.dev
+---
+- tapOn:
+      id: "tab-profile"
+- assertVisible:
+      id: "profile-screen"

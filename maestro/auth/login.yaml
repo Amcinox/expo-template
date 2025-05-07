@@ -1,0 +1,23 @@
+appId: com.remirage.dev
+---
+- assertVisible: "Welcome to Remirage"
+
+- tapOn:
+      id: "login-button"
+
+- tapOn:
+      id: "username"
+- longPressOn:
+      id: "username"
+- tapOn: "Select All"
+- eraseText
+
+- inputText: ${USERNAME}
+- tapOn:
+      id: "password"
+- inputText: ${PASSWORD}
+- tapOn:
+      id: "login-button"
+
+- assertVisible:
+      id: "home-tab"

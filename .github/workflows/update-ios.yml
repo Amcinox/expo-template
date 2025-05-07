@@ -1,0 +1,58 @@
+name: Update iOS Only
+
+on:
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: "Environment to update for"
+                required: true
+                default: "dev"
+                type: choice
+                options:
+                    - dev
+                    - stg
+                    - prod
+
+jobs:
+    update-ios:
+        runs-on: ubuntu-latest
+        steps:
+            - name: 📚 Checkout code
+              uses: actions/checkout@v3
+
+            - name: 🏗 Setup Node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18.x
+
+            - name: 📦 Install dependencies
+              run: yarn install
+
+            - name: 🔍 Set environment variables
+              id: env_vars
+              run: |
+                  if [[ "${{ github.event.inputs.environment }}" == "dev" ]]; then
+                    echo "ENVIRONMENT=development" >> $GITHUB_OUTPUT
+                    echo "CHANNEL=development" >> $GITHUB_OUTPUT
+                  elif [[ "${{ github.event.inputs.environment }}" == "stg" ]]; then
+                    echo "ENVIRONMENT=preview" >> $GITHUB_OUTPUT
+                    echo "CHANNEL=preview" >> $GITHUB_OUTPUT
+                  elif [[ "${{ github.event.inputs.environment }}" == "prod" ]]; then
+                    echo "ENVIRONMENT=production" >> $GITHUB_OUTPUT
+                    echo "CHANNEL=production" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Get last commit message
+              id: last_commit
+              run: echo "LAST_COMMIT_MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
+
+            - name: Install EAS CLI
+              run: npm install -g eas-cli@15.0.15
+
+            - name: 🚀 Update iOS
+              env:
+                  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+                  ENVIRONMENT: ${{ steps.env_vars.outputs.ENVIRONMENT }}
+                  CHANNEL: ${{ steps.env_vars.outputs.CHANNEL }}
+                  LAST_COMMIT_MESSAGE: ${{ env.LAST_COMMIT_MESSAGE }}
+              run: eas update -p ios --environment $ENVIRONMENT --channel $CHANNEL --message "$LAST_COMMIT_MESSAGE"
