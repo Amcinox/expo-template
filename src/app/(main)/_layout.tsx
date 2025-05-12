@@ -1,7 +1,6 @@
 
 import React from "react";
 import { Redirect, Stack } from "expo-router";
-import { useCustomerStore } from "@/stores/customerStore";
 import { AppStateGuard, StatusGuard } from "@/guards";
 import AppStateLockFallback from "@/guards/fallbacks/AppStateLockFallback";
 import { useClerk } from "@clerk/clerk-expo";
@@ -9,7 +8,6 @@ import { useClerk } from "@clerk/clerk-expo";
 export default function _layout() {
 
     const { isSignedIn } = useClerk()
-    const { customer, isLoading } = useCustomerStore()
 
     if (!isSignedIn) {
         return <Redirect href="/(auth)" />;
@@ -34,9 +32,7 @@ export default function _layout() {
                 headerShown: false,
             }}>
 
-                {/* <Stack.Screen name="(tabs)" /> */}
-
-
+                <Stack.Screen name="(tabs)" />
             </Stack>
 
         </AppStateGuard>

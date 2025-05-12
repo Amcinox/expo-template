@@ -99,7 +99,6 @@
         "react-hook-form": "^7.54.2",
         "react-i18next": "^15.4.1",
         "react-native": "0.79.2",
-        "react-native-color-matrix-image-filters": "^7.0.2",
         "react-native-css-interop": "^0.1.22",
         "react-native-gesture-handler": "~2.24.0",
         "react-native-pager-view": "6.7.1",

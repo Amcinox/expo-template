@@ -6,9 +6,7 @@ import { useSettings } from "@/contexts/SettingsContext"
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs"
 import Svg, { Path } from "react-native-svg"
 import IconLogo from "@/components/logo/IconLogo"
-import {
-    Grayscale,
-} from 'react-native-color-matrix-image-filters'
+
 
 const { width } = Dimensions.get("window")
 
@@ -102,17 +100,15 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
                 ]}
                 onPress={() => navigation.navigate("home")}
             >
-                <Grayscale amount={state.index === 2 ? 0 : 0.9}>
-                    <IconLogo
-                        style={{
-                            width: centerButtonSize * 0.6,
-                            height: centerButtonSize * 0.6,
-                            opacity: state.index === 2 ? 1 : 0.7
-                        }}
+                <IconLogo
+                    style={{
+                        width: centerButtonSize * 0.6,
+                        height: centerButtonSize * 0.6,
+                        opacity: state.index === 2 ? 1 : 0.7
+                    }}
 
 
-                        className="h-12 w-12 " />
-                </Grayscale>
+                    className="h-12 w-12 " />
             </TouchableOpacity>
         </View>
     )

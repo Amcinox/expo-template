@@ -1,155 +1,188 @@
-import { Text, ScrollView } from "react-native";
+import { Text, ScrollView, Pressable } from "react-native";
 import React from "react";
 import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
 import { useRouter } from "expo-router";
-import _ from "lodash";
-import { useCustomerStore } from "@/stores/customerStore";
-import { Avatar, AvatarFallbackText, AvatarBadge } from "@/components/ui/avatar";
+import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { useSettings } from "@/contexts/SettingsContext";
-import { Menu, MenuItem, MenuItemType } from "@/components/navigation/MenuButton";
 import { Center } from "@/components/ui/center";
 import { useCustomToast } from "@/components/CustomToast";
 import { getBiometricTitle } from "@/utils/auth-helpers";
-import useAllTrue from "@/hooks/useAllTrue";
-
-
+import { useUser, useClerk } from "@clerk/clerk-expo";
+import { Ionicons } from "@expo/vector-icons";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Divider } from "@/components/ui/divider";
+import { Box } from "@/components/ui/box";
+import * as LocalAuthentication from "expo-local-authentication";
 
 export default function Profile() {
     const router = useRouter();
-    const { customer } = useCustomerStore();
-    const { appConfig, permissions } = useSettings()
-    const { logout, enableBiometric, disableBiometric, isBiometricEnabled, biometricOwner, user } = useAuth()
-    const { showToast } = useCustomToast()
-    const { availableAuthenticators } = permissions?.biometric!
-    const biometricTitle = getBiometricTitle(availableAuthenticators[0])
-    const isEnabled = useAllTrue(isBiometricEnabled, biometricOwner === user?.email)
-
+    const { user } = useUser();
+    const { signOut } = useClerk();
+    const { appConfig, permissions, theme } = useSettings();
+    const { showToast } = useCustomToast();
+    const { availableAuthenticators } = permissions?.biometric!;
+    const biometricTitle = getBiometricTitle(availableAuthenticators[0]);
 
     const handleEnableBiometric = async () => {
         try {
-            await enableBiometric()
-            showToast({
-                type: "success",
-                title: "Biometrics",
-                message: "Enabled Successfully "
-            })
+            const hasHardware = await LocalAuthentication.hasHardwareAsync();
+            if (!hasHardware) {
+                showToast({
+                    type: "error",
+                    title: "Biometrics",
+                    message: "No biometric hardware found"
+                });
+                return;
+            }
 
+            const result = await LocalAuthentication.authenticateAsync({
+                promptMessage: `Enable ${biometricTitle}`,
+                fallbackLabel: "Use passcode"
+            });
+
+            if (result.success) {
+                showToast({
+                    type: "success",
+                    title: "Biometrics",
+                    message: "Enabled Successfully"
+                });
+            }
         } catch (error: any) {
             showToast({
                 type: "error",
                 title: "Biometrics",
                 message: error.message
-            })
+            });
         }
+    };
 
-    }
-
-    const menuItems: MenuItem[] = [
+    const menuItems = [
         {
-            id: 'account',
-            type: MenuItemType.GROUP,
-            label: 'Account',
-            children: [
+            title: "Account",
+            items: [
                 {
-                    id: 'change-password',
-                    type: MenuItemType.ACTION,
-                    label: 'Change Password',
-                    onPress: () => router.push("/change-password")
+                    icon: "person-outline",
+                    label: "Edit Profile",
+                    onPress: () => router.push("/(main)/(default)/settings/edit-profile" as any)
                 },
                 {
-                    id: 'logout',
-                    type: MenuItemType.ACTION,
-                    label: 'Log Out',
-                    showIcon: false,
-                    testID: 'logout-button',
-                    onPress: async () => {
-                        await logout()
-                    }
-                }
-            ]
-        },
-        {
-            id: 'profile',
-            type: MenuItemType.GROUP,
-            label: 'Profile Information',
-            children: [
-                {
-                    id: 'basic-info',
-                    type: MenuItemType.ACTION,
-                    label: 'Basic Information',
-                    onPress: () => router.push("/basic-information")
+                    icon: "lock-closed-outline",
+                    label: "Change Password",
+                    onPress: () => router.push("/(main)/(default)/settings/change-password" as any)
                 },
                 {
-                    id: 'close-account',
-                    type: MenuItemType.ACTION,
-                    label: 'Close Account',
-                    showIcon: false,
-                    className: "text-error-500",
-                    onPress: () => {
-                        console.log('Closing account');
-                    }
-                },
-            ]
-        },
-
-        {
-            id: 'settings',
-            type: MenuItemType.GROUP,
-            label: 'Settings',
-            children: [
-                {
-
-                    id: 'face-id',
-                    type: MenuItemType.TOGGLE,
+                    icon: "finger-print-outline",
                     label: `Use ${biometricTitle}`,
-                    defaultValue: isBiometricEnabled && biometricOwner === user?.email,
-                    onToggle: async (value) => {
-                        console.log(`Face ID setting: ${value}`);
-                        if (isBiometricEnabled && biometricOwner === user?.email) {
-                            disableBiometric()
-                        } else {
-                            await handleEnableBiometric()
-                        }
-                    }
-                },
-                {
-                    id: 'terms-privacy',
-                    type: MenuItemType.ACTION,
-                    label: 'Terms & Privacy',
-                    showIcon: false,
-                    primary: true,
-                    className: "text-primary-500",
-                    onPress: () => router.push("/terms-and-privacy")
+                    onPress: handleEnableBiometric
                 }
             ]
         },
-
+        {
+            title: "Preferences",
+            items: [
+                {
+                    icon: "notifications-outline",
+                    label: "Notifications",
+                    onPress: () => router.push("/(main)/(default)/settings/notifications" as any)
+                },
+                {
+                    icon: "language-outline",
+                    label: "Language",
+                    onPress: () => router.push("/(main)/(default)/settings/language" as any)
+                },
+                {
+                    icon: "moon-outline",
+                    label: "Dark Mode",
+                    onPress: () => router.push("/(main)/(default)/settings/theme" as any)
+                }
+            ]
+        },
+        {
+            title: "Support",
+            items: [
+                {
+                    icon: "help-circle-outline",
+                    label: "Help Center",
+                    onPress: () => router.push("/(main)/(default)/settings/help" as any)
+                },
+                {
+                    icon: "document-text-outline",
+                    label: "Terms & Privacy",
+                    onPress: () => router.push("/(main)/(default)/settings/terms-and-privacy" as any)
+                }
+            ]
+        }
     ];
 
     return (
-        <ScrollView className="flex-1 p-4" showsVerticalScrollIndicator={false} testID="profile-screen">
-            <VStack space="2xl">
-                <HStack className="items-center" space="md">
-                    <Avatar size="lg" className="bg-background-600">
-                        <AvatarFallbackText>{customer?.firstName} {customer?.lastName}</AvatarFallbackText>
-                        <AvatarBadge />
+        <ScrollView className="flex-1" showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+                paddingBottom: 100
+            }}
+        >
+            <VStack space="2xl" className="p-4">
+                {/* Profile Header */}
+                <Center className="py-8">
+                    <Avatar size="2xl" className="mb-4">
+                        {user?.imageUrl ? (
+                            <AvatarImage source={{ uri: user.imageUrl }} />
+                        ) : (
+                            <AvatarFallbackText>
+                                {user?.firstName?.[0]}{user?.lastName?.[0]}
+                            </AvatarFallbackText>
+                        )}
                     </Avatar>
-                    <VStack>
-                        <Text className="text-typography-600 font-bold">
-                            {_.startCase(customer?.firstName)}
+                    <Text className="text-typography-600 text-xl font-bold">
+                        {user?.firstName} {user?.lastName}
+                    </Text>
+                    <Text className="text-typography-400">
+                        {user?.primaryEmailAddress?.emailAddress}
+                    </Text>
+                </Center>
+
+                {/* Menu Sections */}
+                {menuItems.map((section, sectionIndex) => (
+                    <Box key={section.title} className="bg-background-100 rounded-xl overflow-hidden">
+                        <Text className="text-typography-800 px-4 py-2 text-md font-medium">
+                            {section.title}
                         </Text>
-                        <Text className="text-typography-600 font-bold">
-                            {_.startCase(customer?.lastName)}
-                        </Text>
-                    </VStack>
-                </HStack>
-                <Menu items={menuItems} />
+                        <Divider />
+                        {section.items.map((item, itemIndex) => (
+                            <React.Fragment key={item.label}>
+                                <Pressable
+                                    onPress={item.onPress}
+                                    className="flex-row items-center px-4 py-3"
+                                >
+                                    <Ionicons name={item.icon as any} size={24} color={theme.primary} />
+                                    <Text className="text-typography-800 ml-3 flex-1">
+                                        {item.label}
+                                    </Text>
+                                    <Ionicons name="chevron-forward" size={20} color={theme.primary} />
+                                </Pressable>
+                                {itemIndex < section.items.length - 1 && <Divider />}
+                            </React.Fragment>
+                        ))}
+                    </Box>
+                ))}
+
+                {/* Logout Button */}
+                <Button
+                    variant="outline"
+                    action="negative"
+                    className="mt-4"
+                    onPress={() => signOut()}
+                >
+                    <ButtonText className="text-error-500">Log Out</ButtonText>
+                </Button>
+
+                {/* App Version */}
+                <Center className="py-4">
+                    <Text className="text-typography-400">
+                        Version {appConfig.currentVersion}
+                    </Text>
+                </Center>
             </VStack>
-            <Center className="pb-44" >
-                <Text className="text-typography-600">App version {appConfig.currentVersion}
-                </Text>
-            </Center>
         </ScrollView>
     );
 }

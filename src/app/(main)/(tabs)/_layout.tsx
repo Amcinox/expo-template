@@ -83,16 +83,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="support"
+        name="settings"
         options={{
-          title: t("Support"),
-          tabBarIcon: ({ color }) => <TabBarIcon name="customerservice" color={color} />,
+          title: t("Settings"),
+          tabBarIcon: ({ color }) => <TabBarIcon name="setting" color={color} />,
         }}
-        listeners={{
-          tabPress: async (e) => {
-            e.preventDefault();
-          },
-        }}
+
       />
     </Tabs>
   )

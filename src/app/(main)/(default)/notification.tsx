@@ -1,10 +1,10 @@
 import { View, Text } from "react-native";
 import React from "react";
 
-export default function SupportScreen() {
+export default function notification() {
     return (
         <View>
-            <Text>support</Text>
+            <Text>notification</Text>
         </View>
     );
 }
