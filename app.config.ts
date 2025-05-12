@@ -133,7 +133,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
                     "iosApiKey": process.env.EXPO_PUBLIC_INTERCOM_IOS_API_KEY
                 }
             ],
-            // "expo-localization",
+            "expo-localization",
+            "expo-web-browser"
             // [
             //     "expo-sensors",
             //     {
