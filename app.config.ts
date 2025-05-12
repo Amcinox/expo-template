@@ -13,22 +13,22 @@ interface EnvironmentConfig {
 
 const envConfig: Record<Environment, EnvironmentConfig> = {
     dev: {
-        bundleId: 'com.remirage.expo.dev',
-        packageName: 'com.remirage.expodev',
-        appName: 'Remirage - DEV Expo',
+        bundleId: 'com.remirage.stylemind.dev',
+        packageName: 'com.remirage.stylemind.dev',
+        appName: 'StyleMind - DEV',
         icon: "./src/assets/images/icon-dev.png",
     },
     stg: {
-        bundleId: 'com.remirage.expo.stg',
-        packageName: 'com.remirage.expostg',
-        appName: 'Remirage - STG',
+        bundleId: 'com.remirage.stylemind.stg',
+        packageName: 'com.remirage.stylemind.stg',
+        appName: 'StyleMind - STG',
         icon: "./src/assets/images/icon-stg.png",
         googleServicesFile: "./google-services.json"
     },
     prod: {
-        bundleId: 'com.remirage.expo',
-        packageName: 'com.remirage.expo',
-        appName: 'Remirage - Expo',
+        bundleId: 'com.remirage.stylemind',
+        packageName: 'com.remirage.stylemind',
+        appName: 'StyleMind',
         icon: "./src/assets/images/icon.png",
     },
 };
@@ -54,7 +54,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         version: "1.0.0",
         orientation: "portrait",
         icon: icon || "./src/assets/images/icon.png",
-        scheme: "remirage",
+        scheme: "stylemind",
         userInterfaceStyle: "automatic",
         splash: {
             image: "./src/assets/images/splash.png",
@@ -122,15 +122,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
                     "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
                     "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
                     "recordAudioAndroid": true
-                }
-            ],
-
-            [
-                "@intercom/intercom-react-native",
-                {
-                    "appId": process.env.EXPO_PUBLIC_INTERCOM_APP_ID,
-                    "androidApiKey": process.env.EXPO_PUBLIC_INTERCOM_ANDROID_API_KEY,
-                    "iosApiKey": process.env.EXPO_PUBLIC_INTERCOM_IOS_API_KEY
                 }
             ],
             "expo-localization",

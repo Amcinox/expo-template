@@ -3,8 +3,7 @@ import { DefaultFallback } from './fallbacks/DefaultFallback';
 import { StatusGuardProps } from './types';
 
 import statusAnimation from '@/assets/lottie/no-permission.json';
-import { useAuth } from '@/contexts/AuthContext';
-
+import { useClerk } from '@clerk/clerk-expo';
 export const StatusGuard: React.FC<StatusGuardProps> = ({
     children,
     status,
@@ -13,8 +12,7 @@ export const StatusGuard: React.FC<StatusGuardProps> = ({
     showFallback = true,
 }) => {
     const isAllowed = allowedStatuses.includes(status);
-    const { logout } = useAuth();
-
+    const { signOut } = useClerk()
     if (!isAllowed) {
         if (!showFallback) return null;
 
@@ -28,7 +26,7 @@ export const StatusGuard: React.FC<StatusGuardProps> = ({
                 message={`Current status "${status}" is not allowed. Allowed statuses: ${allowedStatuses.join(', ')}`}
                 animation={statusAnimation}
                 buttonHandler={async () => {
-                    await logout();
+                    await signOut();
                 }}
                 buttonText="Back to Login"
             />

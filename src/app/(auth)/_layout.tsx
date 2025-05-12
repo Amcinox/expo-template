@@ -1,35 +1,22 @@
-import HelpButton from '@/components/intercom/helpButton';
-import { useAuth } from '@/contexts/AuthContext';
 import { useSettings } from '@/contexts/SettingsContext';
-import { useCustomerStore } from '@/stores/customerStore';
-import Intercom from '@intercom/intercom-react-native';
+import { useAuth } from '@clerk/clerk-expo';
 import { Redirect, Stack } from 'expo-router';
-import { useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AuthLayout() {
-    const { isAuthenticated } = useAuth();
+    // const { isAuthenticated } = useAuth();
     const { theme } = useSettings()
-    const { clearCustomer } = useCustomerStore()
+
+
+    const { isSignedIn } = useAuth()
+
+    // if (isSignedIn) {
+    //   return <Redirect href={'/'} />
+    // }
 
 
 
-    useEffect(() => {
-        const clearAll = async () => {
-            if (isAuthenticated) return
-            try {
-                clearCustomer()
-                await Intercom.logout()
-                await Intercom.loginUnidentifiedUser()
-            } catch (error) {
-                console.log(error)
-            }
-        };
-        clearAll()
-
-    }, [isAuthenticated])
-
-    if (isAuthenticated) {
+    if (isSignedIn) {
         return <Redirect href="/(main)/(tabs)/home" />;
     }
     return (
@@ -55,13 +42,11 @@ export default function AuthLayout() {
                 <Stack.Screen name="login" options={{ title: 'Login' }} />
                 <Stack.Screen name="forgot-password" options={{
                     title: 'Forgot Password',
-                    headerRight: () => <HelpButton />,
                 }} />
                 <Stack.Screen name="confirm-password" options={{
                     title: 'Confirm Password',
-                    headerRight: () => <HelpButton />,
                 }} />
-                <Stack.Screen name="signup" options={{ headerShown: false }} />
+                <Stack.Screen name="signup" />
 
 
             </Stack>

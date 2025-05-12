@@ -5,7 +5,6 @@ import { Text, Animated, View } from "react-native"
 import { VStack } from "@/components/ui/vstack"
 import { HStack } from "@/components/ui/hstack"
 import { useSettings } from "@/contexts/SettingsContext"
-import { useAuth } from "@/contexts/AuthContext"
 import type { AppStateFallbackProps } from "../types"
 import BiometricLoginButton from "@/components/auth/BiometricLoginButton"
 import { Button, ButtonText } from "@/components/ui/button"
@@ -15,10 +14,11 @@ import { Ionicons } from "@expo/vector-icons"
 import { Box } from "@/components/ui/box"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { LinearGradient } from "expo-linear-gradient"
+import { useClerk } from "@clerk/clerk-expo"
 
 export default function AppStateLockFallback({ onUnlock, onLock, isLocked }: AppStateFallbackProps) {
     const { permissions, toggleSplashLoading, theme } = useSettings()
-    const { isBiometricEnabled, loginWithBiometric, logout } = useAuth()
+    const { signOut } = useClerk()
     const { availableAuthenticators } = permissions?.biometric!
     const biometricTitle = getBiometricTitle(availableAuthenticators[0])
     const [authError, setAuthError] = useState<string | null>(null)
@@ -64,7 +64,6 @@ export default function AppStateLockFallback({ onUnlock, onLock, isLocked }: App
         setAuthError(null)
         try {
             toggleSplashLoading(true)
-            await loginWithBiometric()
             onUnlock()
         } catch (e: any) {
             console.log(e)
@@ -76,7 +75,7 @@ export default function AppStateLockFallback({ onUnlock, onLock, isLocked }: App
 
     const handleLogout = async () => {
         try {
-            await logout()
+            await signOut()
             onUnlock()
         } catch (error) {
             console.error("Logout failed:", error)
@@ -85,14 +84,6 @@ export default function AppStateLockFallback({ onUnlock, onLock, isLocked }: App
 
 
 
-    useEffect(() => {
-        if (!isBiometricEnabled) {
-            handleLogout()
-        }
-
-    }, [isBiometricEnabled])
-
-    if (!isBiometricEnabled) return null
 
 
     return (
@@ -159,19 +150,6 @@ export default function AppStateLockFallback({ onUnlock, onLock, isLocked }: App
                             )}
 
                             <VStack space="md" className="w-full mt-8">
-                                {!isBiometricEnabled && (
-                                    <Button
-                                        variant="solid"
-                                        action="secondary"
-                                        onPress={handleLogout}
-                                        className="w-full mt-3 h-14 rounded-lg"
-                                    >
-                                        <HStack space="sm" className="items-center">
-                                            <Ionicons name="log-out-outline" size={18} color="white" />
-                                            <ButtonText className="text-white font-medium">Log Out</ButtonText>
-                                        </HStack>
-                                    </Button>
-                                )}
 
                                 <Button
                                     variant="outline"

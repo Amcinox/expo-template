@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'expo-router';
 import { useSettings } from '@/contexts/SettingsContext';
-import { useAuth } from '@/contexts/AuthContext';
 
 // Components
 import { VStack } from "@/components/ui/vstack"
@@ -21,19 +20,21 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginSchema, LoginPayload } from '@/schemas/auth/login.schema';
 import BiometricLoginButton from '@/components/auth/BiometricLoginButton';
 import { ActivityIndicator } from 'react-native';
+import { useSignIn } from '@clerk/clerk-expo';
 
 
 
 export default function LoginScreen() {
     const router = useRouter()
+    const { signIn, setActive, isLoaded } = useSignIn()
+
     const { toggleSplashLoading, permissions, theme } = useSettings()
     const [showPassword, setShowPassword] = useState(false)
-    const { loginWithPassword, isLoading, isBiometricEnabled, rememberedUsername } = useAuth();
 
     const form = useForm<LoginPayload>({
         resolver: zodResolver(LoginSchema),
         defaultValues: {
-            username: rememberedUsername || process.env.EXPO_PUBLIC_DEMO_USERNAME,
+            username: process.env.EXPO_PUBLIC_DEMO_USERNAME,
             password: process.env.EXPO_PUBLIC_DEMO_PASSWORD,
             rememberMe: true,
         },
@@ -43,19 +44,37 @@ export default function LoginScreen() {
     const { handleSubmit } = form;
 
     const login = handleSubmit(async (data: LoginPayload) => {
+        if (!isLoaded) return
+        toggleSplashLoading(true)
+        // Start the sign-in process using the email and password provided
         try {
-            toggleSplashLoading(true)
-            const user = await loginWithPassword(data.username, data.password, {
-                rememberMe: data.rememberMe!
-            });
-        } catch (error: any) {
+            const signInAttempt = await signIn.create({
+                identifier: data.username,
+                password: data.password,
+            })
+
+            // If sign-in process is complete, set the created session as active
+            // and redirect the user
+            if (signInAttempt.status === 'complete') {
+                await setActive({ session: signInAttempt.createdSessionId })
+                router.replace('/')
+            } else {
+                // If the status isn't complete, check why. User might need to
+                // complete further steps.
+                console.error(JSON.stringify(signInAttempt, null, 2))
+            }
+        } catch (err) {
+            // See https://clerk.com/docs/custom-flows/error-handling
+            // for more info on error handling
             form.setError("password", {
-                message: error.message,
+                message: (err as Error).message,
             });
+            console.error(JSON.stringify(err, null, 2))
         } finally {
             toggleSplashLoading(false)
         }
     })
+
 
 
 
@@ -96,11 +115,11 @@ export default function LoginScreen() {
                             <Button
                                 className='rounded-3xl h-12 flex-1'
                                 variant="solid"
-                                isDisabled={isLoading}
+                                isDisabled={isLoaded}
                                 testID='login-button'
                                 onPress={login}
                             >
-                                {isLoading && <ActivityIndicator size="small" color={"#FFF"} />}
+                                {isLoaded && <ActivityIndicator size="small" color={"#FFF"} />}
 
                                 <ButtonText>
                                     Login

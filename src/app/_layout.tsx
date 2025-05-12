@@ -5,7 +5,6 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { SettingsProvider, useSettings } from '@/contexts/SettingsContext';
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -15,7 +14,8 @@ import { useFonts } from "expo-font";
 import { FontAwesome } from "@expo/vector-icons";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import useAllTrue from "@/hooks/useAllTrue";
-
+import { tokenCache } from '@clerk/clerk-expo/token-cache'
+import { ClerkProvider } from '@clerk/clerk-expo'
 
 export {
   ErrorBoundary,
@@ -35,9 +35,9 @@ export default function SettingsLayout() {
     <ErrorBoundary>
       <SettingsProvider>
         <GluestackUIProvider mode="light">
-          <AuthProvider>
+          <ClerkProvider tokenCache={tokenCache}>
             <App />
-          </AuthProvider>
+          </ClerkProvider>
         </GluestackUIProvider>
       </SettingsProvider>
     </ErrorBoundary>
@@ -53,10 +53,9 @@ function App() {
     ...FontAwesome.font,
   });
   const colorScheme = useColorScheme();
-  const { isInitialized } = useAuth();
   const { settingsInitilized } = useSettings()
 
-  const isComplete = useAllTrue(settingsInitilized, isInitialized, loaded);
+  const isComplete = useAllTrue(settingsInitilized, loaded);
   useEffect(() => {
     if (error) throw error;
   }, [error]);

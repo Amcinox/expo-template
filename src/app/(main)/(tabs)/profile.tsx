@@ -7,7 +7,6 @@ import _ from "lodash";
 import { useCustomerStore } from "@/stores/customerStore";
 import { Avatar, AvatarFallbackText, AvatarBadge } from "@/components/ui/avatar";
 import { useSettings } from "@/contexts/SettingsContext";
-import { useAuth } from "@/contexts/AuthContext";
 import { Menu, MenuItem, MenuItemType } from "@/components/navigation/MenuButton";
 import { Center } from "@/components/ui/center";
 import { useCustomToast } from "@/components/CustomToast";

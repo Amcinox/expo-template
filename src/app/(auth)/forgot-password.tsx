@@ -16,12 +16,10 @@ import { Button, ButtonText } from "@/components/ui/button";
 // Validation
 import { ForgotPasswordPayload, ForgotPasswordSchema } from "@/schemas/auth/forgotPassword.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/contexts/SettingsContext";
 
 export default function ForgotPasswordScreen() {
     const router = useRouter()
-    const { forgotPassword } = useAuth()
     const { toggleSplashLoading } = useSettings()
 
     const form = useForm<ForgotPasswordPayload>({
@@ -37,7 +35,7 @@ export default function ForgotPasswordScreen() {
         toggleSplashLoading(true)
         try {
 
-            await forgotPassword(data.username)
+            // await forgotPassword(data.username)
 
             router.push({
                 pathname: "/confirm-password",

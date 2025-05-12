@@ -6,8 +6,7 @@ import deviceAnimation from '@/assets/lottie/lock.json';
 import { DefaultFallback } from './fallbacks/DefaultFallback';
 import SplashLoading from '@/components/SplashLoading';
 import { useSettings } from '@/contexts/SettingsContext';
-import { useAuth } from '@/contexts/AuthContext';
-
+import { useClerk } from '@clerk/clerk-expo';
 // Storage keys
 const BACKGROUND_TIME_KEY = '@AppStateGuard:backgroundTime';
 const IS_LOCKED_KEY = '@AppStateGuard:isLocked';
@@ -40,12 +39,12 @@ export const AppStateGuard: React.FC<EnhancedAppStateGuardProps> = ({
     onAppTerminated,
 }) => {
     const { theme } = useSettings();
-    const { logout } = useAuth();
+    const { signOut } = useClerk()
     const [isLocked, setIsLocked] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
     const [wasTerminated, setWasTerminated] = useState(false);
     const appState = useRef(AppState.currentState);
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const backgroundedTimeRef = useRef<number | null>(null);
 
     // Use backgroundTimeoutSeconds if provided, otherwise fall back to timeoutSeconds
@@ -241,7 +240,7 @@ export const AppStateGuard: React.FC<EnhancedAppStateGuardProps> = ({
                 message={message}
                 animation={deviceAnimation}
                 buttonHandler={async () => {
-                    await logout();
+                    await signOut();
                     await handleUnlock();
                 }}
                 buttonText="Back to Login"

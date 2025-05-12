@@ -33,7 +33,7 @@ export default function AuthHome() {
                     className='w-3/4 rounded-3xl h-12'
                     variant="solid"
                     testID='login-button'
-                    onPress={() => router.push('/login')} >
+                    onPress={() => router.push('/signin')} >
                     <ButtonText>
                         Login
                     </ButtonText>

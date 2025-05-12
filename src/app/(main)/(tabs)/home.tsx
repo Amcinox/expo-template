@@ -4,40 +4,24 @@ import { useEffect, useCallback, useState, useLayoutEffect, useMemo, useRef } fr
 import { ScrollView, RefreshControl, View, Platform } from "react-native"
 import { useSettings } from "@/contexts/SettingsContext"
 import { useCustomerStore } from "@/stores/customerStore"
-
-import { useAuth } from "@/contexts/AuthContext"
-import { useCopilot } from "react-native-copilot"
+import { Text } from "@/components/ui/text"
 
 
 export default function HomeScreen() {
     const { theme, walkThrough } = useSettings()
     const [refreshing, setRefreshing] = useState(false)
     const { customer, getCustomer } = useCustomerStore()
-    const { user } = useAuth()
-    const { start } = useCopilot()
     const [isScreenReady, setIsScreenReady] = useState(false)
     const initialRender = useRef(true)
-    const startCopilotTour = useCallback(() => {
-        if (!isScreenReady || walkThrough) return;
-        if (initialRender.current) {
-            initialRender.current = false;
-            start();
-        }
-    }, [isScreenReady, start]);
 
-    useEffect(() => {
-        if (customer && isScreenReady) {
-            startCopilotTour();
-        }
-    }, [customer, isScreenReady, startCopilotTour]);
+
 
 
 
     const onRefresh = useCallback(async () => {
         setRefreshing(true)
-        await getCustomer(user?.["custom:user_id"]!)
         setRefreshing(false)
-    }, [getCustomer, user])
+    }, [getCustomer])
 
 
 
@@ -52,7 +36,7 @@ export default function HomeScreen() {
 
     return (
         <ScrollView
-            className="flex-1"
+            className="flex-1 bg-background-50"
             showsVerticalScrollIndicator={false}
             onLayout={handleScreenLayout}
             refreshControl={
@@ -64,7 +48,7 @@ export default function HomeScreen() {
                 />
             }
         >
-
+            <Text>Hello</Text>
         </ScrollView>
     )
 }

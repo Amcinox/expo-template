@@ -21,7 +21,6 @@ import { Pressable } from "@/components/ui/pressable";
 // Validation
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ResetPasswordPayload, ResetPasswordSchema } from "@/schemas/auth/resetPassword.schema";
-import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/contexts/SettingsContext";
 
 
@@ -30,7 +29,6 @@ export default function ConfirmPasswordScreen() {
     const [showPassword, setShowPassword] = useState(false)
     const router = useRouter()
     const { email } = useLocalSearchParams();
-    const { confirmForgotPassword } = useAuth()
     const { toggleSplashLoading } = useSettings()
     const form = useForm<ResetPasswordPayload>({
         resolver: zodResolver(ResetPasswordSchema),
@@ -46,10 +44,10 @@ export default function ConfirmPasswordScreen() {
         toggleSplashLoading(true)
         try {
             // reset password
-            await confirmForgotPassword(email as string, data.verificationCode, data.password)
+            // await confirmForgotPassword(email as string, data.verificationCode, data.password)
 
             router.push({
-                pathname: "/login",
+                pathname: "/signin",
             })
         }
         catch (error: any) {

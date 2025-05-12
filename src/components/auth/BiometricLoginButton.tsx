@@ -1,5 +1,4 @@
 import React from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "../ui/button";
 import { useSettings } from "@/contexts/SettingsContext";
 import BiometricIcon from "./BiometricIcon";
@@ -8,14 +7,11 @@ import { useCustomToast } from "../CustomToast";
 interface BiometricLoginButtonProps extends React.ComponentProps<typeof Button> {
 }
 export default function BiometricLoginButton(props: BiometricLoginButtonProps) {
-    const { isBiometricEnabled, loginWithBiometric } = useAuth()
     const { permissions, theme } = useSettings()
     const { showToast } = useCustomToast()
-    if (!isBiometricEnabled) return null
 
     const handleBiometricLogin = async () => {
         try {
-            const user = await loginWithBiometric();
         } catch (error: any) {
             showToast({
                 title: error.message,
