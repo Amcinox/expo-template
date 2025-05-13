@@ -15,27 +15,27 @@ export default function _layout() {
 
 
     return (
-        <AppStateGuard
-            guardOnStates={["background", "inactive"]}
-            backgroundTimeoutSeconds={900}
-            terminationTimeoutSeconds={2}
+        // <AppStateGuard
+        //     guardOnStates={["background", "inactive"]}
+        //     backgroundTimeoutSeconds={900}
+        //     terminationTimeoutSeconds={2}
 
-            timeoutSeconds={1}
-            fallback={({ onUnlock, onLock, isLocked }) => <AppStateLockFallback
-                onUnlock={onUnlock}
-                onLock={onLock}
-                isLocked={isLocked}
-            />}
+        //     timeoutSeconds={1}
+        //     fallback={({ onUnlock, onLock, isLocked }) => <AppStateLockFallback
+        //         onUnlock={onUnlock}
+        //         onLock={onLock}
+        //         isLocked={isLocked}
+        //     />}
 
-        >
-            <Stack screenOptions={{
-                headerShown: false,
-            }}>
+        // >
+        <Stack screenOptions={{
+            headerShown: false,
+        }}>
 
-                <Stack.Screen name="(tabs)" />
-            </Stack>
+            <Stack.Screen name="(tabs)" />
+        </Stack>
 
-        </AppStateGuard>
+        // </AppStateGuard>
 
     );
 }

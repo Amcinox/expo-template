@@ -14,15 +14,63 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { Divider } from "@/components/ui/divider";
 import { Box } from "@/components/ui/box";
 import * as LocalAuthentication from "expo-local-authentication";
+import * as SecureStore from 'expo-secure-store';
+import { Actionsheet, ActionsheetContent, ActionsheetItem, ActionsheetItemText, ActionsheetDragIndicator, ActionsheetDragIndicatorWrapper, ActionsheetBackdrop } from "@/components/ui/actionsheet";
+import { Languages } from "@/types/settings";
+import { ColorSchemeName } from "react-native";
+
+const languages = [
+    { code: Languages.EN, name: "English", key: "en" },
+    { code: Languages.ES, name: "Español", key: "es" },
+    { code: Languages.FR, name: "Français", key: "fr" },
+    { code: Languages.JA, name: "日本語", key: "ja" },
+];
+
+const themes = [
+    {
+        id: "light",
+        title: "Light",
+        description: "Use light theme",
+        icon: "sunny-outline"
+    },
+    {
+        id: "dark",
+        title: "Dark",
+        description: "Use dark theme",
+        icon: "moon-outline"
+    },
+    {
+        id: "system",
+        title: "System",
+        description: "Use system theme",
+        icon: "phone-portrait-outline"
+    }
+];
 
 export default function Profile() {
     const router = useRouter();
     const { user } = useUser();
     const { signOut } = useClerk();
-    const { appConfig, permissions, theme } = useSettings();
+    const { appConfig, permissions, theme, language, updateLanguage, colorSchemeName, updateColorScheme } = useSettings();
     const { showToast } = useCustomToast();
     const { availableAuthenticators } = permissions?.biometric!;
     const biometricTitle = getBiometricTitle(availableAuthenticators[0]);
+    const [showLanguageSheet, setShowLanguageSheet] = React.useState(false);
+    const [showThemeSheet, setShowThemeSheet] = React.useState(false);
+    const [isBiometricEnabled, setIsBiometricEnabled] = React.useState(false);
+
+    React.useEffect(() => {
+        checkBiometricStatus();
+    }, []);
+
+    const checkBiometricStatus = async () => {
+        try {
+            const biometricEnabled = await SecureStore.getItemAsync('biometricEnabled');
+            setIsBiometricEnabled(biometricEnabled === 'true');
+        } catch (error) {
+            console.error('Error checking biometric status:', error);
+        }
+    };
 
     const handleEnableBiometric = async () => {
         try {
@@ -42,6 +90,17 @@ export default function Profile() {
             });
 
             if (result.success) {
+                // Store the user's credentials securely
+                const credentials = {
+                    email: user?.primaryEmailAddress?.emailAddress,
+                    // Store a secure identifier for the user
+                    userId: user?.id
+                };
+
+                await SecureStore.setItemAsync('userCredentials', JSON.stringify(credentials));
+                await SecureStore.setItemAsync('biometricEnabled', 'true');
+                setIsBiometricEnabled(true);
+
                 showToast({
                     type: "success",
                     title: "Biometrics",
@@ -55,6 +114,36 @@ export default function Profile() {
                 message: error.message
             });
         }
+    };
+
+    const handleDisableBiometric = async () => {
+        try {
+            await SecureStore.deleteItemAsync('userCredentials');
+            await SecureStore.setItemAsync('biometricEnabled', 'false');
+            setIsBiometricEnabled(false);
+
+            showToast({
+                type: "success",
+                title: "Biometrics",
+                message: "Disabled Successfully"
+            });
+        } catch (error: any) {
+            showToast({
+                type: "error",
+                title: "Biometrics",
+                message: error.message
+            });
+        }
+    };
+
+    const handleLanguageSelect = async (selectedLanguage: Languages) => {
+        await updateLanguage(selectedLanguage);
+        setShowLanguageSheet(false);
+    };
+
+    const handleThemeSelect = async (selectedTheme: ColorSchemeName) => {
+        await updateColorScheme(selectedTheme);
+        setShowThemeSheet(false);
     };
 
     const menuItems = [
@@ -73,8 +162,8 @@ export default function Profile() {
                 },
                 {
                     icon: "finger-print-outline",
-                    label: `Use ${biometricTitle}`,
-                    onPress: handleEnableBiometric
+                    label: isBiometricEnabled ? `Disable ${biometricTitle}` : `Enable ${biometricTitle}`,
+                    onPress: isBiometricEnabled ? handleDisableBiometric : handleEnableBiometric
                 }
             ]
         },
@@ -89,12 +178,12 @@ export default function Profile() {
                 {
                     icon: "language-outline",
                     label: "Language",
-                    onPress: () => router.push("/(main)/(default)/settings/language" as any)
+                    onPress: () => setShowLanguageSheet(true)
                 },
                 {
                     icon: "moon-outline",
                     label: "Dark Mode",
-                    onPress: () => router.push("/(main)/(default)/settings/theme" as any)
+                    onPress: () => setShowThemeSheet(true)
                 }
             ]
         },
@@ -182,6 +271,67 @@ export default function Profile() {
                         Version {appConfig.currentVersion}
                     </Text>
                 </Center>
+
+                {/* Language ActionSheet */}
+                <Actionsheet isOpen={showLanguageSheet} onClose={() => setShowLanguageSheet(false)}>
+                    <ActionsheetBackdrop />
+                    <ActionsheetContent>
+                        <ActionsheetDragIndicatorWrapper>
+                            <ActionsheetDragIndicator />
+                        </ActionsheetDragIndicatorWrapper>
+                        {languages.map((lang) => (
+                            <ActionsheetItem
+                                key={lang.code}
+                                onPress={() => handleLanguageSelect(lang.code)}
+                            >
+                                <VStack space="xs" className="flex-row items-center">
+                                    <Text className="text-typography-800 flex-1">
+                                        {lang.name}
+                                    </Text>
+                                    {language === lang.code && (
+                                        <Ionicons name="checkmark" size={24} color={theme.primary} />
+                                    )}
+                                </VStack>
+                            </ActionsheetItem>
+                        ))}
+                    </ActionsheetContent>
+                </Actionsheet>
+
+                {/* Theme ActionSheet */}
+                <Actionsheet isOpen={showThemeSheet} onClose={() => setShowThemeSheet(false)}>
+                    <ActionsheetBackdrop />
+                    <ActionsheetContent>
+                        <ActionsheetDragIndicatorWrapper>
+                            <ActionsheetDragIndicator />
+                        </ActionsheetDragIndicatorWrapper>
+                        {themes.map((themeOption) => (
+                            <ActionsheetItem
+                                key={themeOption.id}
+                                onPress={() => handleThemeSelect(themeOption.id as ColorSchemeName)}
+                            >
+                                <VStack space="xs" className="flex-row items-center">
+                                    <Ionicons
+                                        name={themeOption.icon as any}
+                                        size={24}
+                                        color={theme.primary}
+                                        style={{ marginRight: 12 }}
+                                    />
+                                    <VStack space="xs" className="flex-1">
+                                        <Text className="text-typography-800 font-medium">
+                                            {themeOption.title}
+                                        </Text>
+                                        <Text className="text-typography-400 text-sm">
+                                            {themeOption.description}
+                                        </Text>
+                                    </VStack>
+                                    {colorSchemeName === themeOption.id && (
+                                        <Ionicons name="checkmark" size={24} color={theme.primary} />
+                                    )}
+                                </VStack>
+                            </ActionsheetItem>
+                        ))}
+                    </ActionsheetContent>
+                </Actionsheet>
             </VStack>
         </ScrollView>
     );

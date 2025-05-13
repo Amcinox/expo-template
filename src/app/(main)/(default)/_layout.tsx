@@ -17,9 +17,11 @@ export default function ProfileLayout() {
                     headerTintColor: "#FFF",
                     headerTitleAlign: "center",
                     headerLeft: () => <GoBack />,
+
+                    title: ""
                 };
             }}>
-            <Stack.Screen name="settings" options={{ title: "Access Earned Income" }} />
+                
         </Stack>
     );
 }

@@ -19,17 +19,21 @@ import { InputIcon, InputSlot } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginSchema, LoginPayload } from '@/schemas/auth/login.schema';
 import BiometricLoginButton from '@/components/auth/BiometricLoginButton';
-import { ActivityIndicator } from 'react-native';
-import { useSignIn } from '@clerk/clerk-expo';
-
-
+import { ActivityIndicator, View } from 'react-native';
+import { useSignIn, useOAuth } from '@clerk/clerk-expo';
+import { Divider } from '@/components/ui/divider';
+import { Text } from '@/components/ui/text';
+import { Link } from 'expo-router';
 
 export default function LoginScreen() {
     const router = useRouter()
     const { signIn, setActive, isLoaded } = useSignIn()
+    const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
+    const { startOAuthFlow: startAppleOAuth } = useOAuth({ strategy: "oauth_apple" });
 
     const { toggleSplashLoading, permissions, theme } = useSettings()
     const [showPassword, setShowPassword] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
     const form = useForm<LoginPayload>({
         resolver: zodResolver(LoginSchema),
@@ -40,43 +44,58 @@ export default function LoginScreen() {
         },
     });
 
-
     const { handleSubmit } = form;
 
     const login = handleSubmit(async (data: LoginPayload) => {
         if (!isLoaded) return
+        setIsLoading(true)
         toggleSplashLoading(true)
-        // Start the sign-in process using the email and password provided
         try {
             const signInAttempt = await signIn.create({
                 identifier: data.username,
                 password: data.password,
             })
 
-            // If sign-in process is complete, set the created session as active
-            // and redirect the user
             if (signInAttempt.status === 'complete') {
                 await setActive({ session: signInAttempt.createdSessionId })
                 router.replace('/')
             } else {
-                // If the status isn't complete, check why. User might need to
-                // complete further steps.
                 console.error(JSON.stringify(signInAttempt, null, 2))
             }
         } catch (err) {
-            // See https://clerk.com/docs/custom-flows/error-handling
-            // for more info on error handling
             form.setError("password", {
                 message: (err as Error).message,
             });
             console.error(JSON.stringify(err, null, 2))
         } finally {
+            setIsLoading(false)
             toggleSplashLoading(false)
         }
     })
 
+    const onGooglePress = async () => {
+        try {
+            const { createdSessionId, setActive } = await startOAuthFlow();
+            if (createdSessionId && setActive) {
+                await setActive({ session: createdSessionId });
+                router.replace('/');
+            }
+        } catch (err) {
+            console.error('OAuth error:', err);
+        }
+    };
 
-
+    const onApplePress = async () => {
+        try {
+            const { createdSessionId, setActive } = await startAppleOAuth();
+            if (createdSessionId && setActive) {
+                await setActive({ session: createdSessionId });
+                router.replace('/');
+            }
+        } catch (err) {
+            console.error('OAuth error:', err);
+        }
+    };
 
     return (
         <Container>
@@ -84,7 +103,7 @@ export default function LoginScreen() {
                 <Heading size="xl" className="text-center mt-10 text-typography-800 font-medium">
                     Welcome to Remirage
                 </Heading>
-                <VStack space="md" >
+                <VStack space="md">
                     <FormProvider methods={form}>
                         <RHFTextField
                             name="username"
@@ -111,22 +130,19 @@ export default function LoginScreen() {
                         />
                         <RHFCheckbox name="rememberMe" checkboxLabel='Remember your username' />
                         <HStack className="justify-between">
-
                             <Button
                                 className='rounded-3xl h-12 flex-1'
                                 variant="solid"
-                                isDisabled={isLoaded}
                                 testID='login-button'
                                 onPress={login}
+                                disabled={isLoading}
                             >
-                                {isLoaded && <ActivityIndicator size="small" color={"#FFF"} />}
-
-                                <ButtonText>
-                                    Login
-                                </ButtonText>
+                                {isLoading ? (
+                                    <ActivityIndicator size="small" color={"#FFF"} />
+                                ) : (
+                                    <ButtonText>Login</ButtonText>
+                                )}
                             </Button>
-
-
                             <BiometricLoginButton />
                         </HStack>
                         <Button
@@ -138,6 +154,40 @@ export default function LoginScreen() {
                             </ButtonText>
                         </Button>
                     </FormProvider>
+
+                    <View className="flex-row items-center my-4">
+                        <Divider className="flex-1" />
+                        <Text className="mx-4 text-typography-400">or</Text>
+                        <Divider className="flex-1" />
+                    </View>
+
+                    <VStack space="md">
+                        <Button
+                            variant="outline"
+                            className='rounded-3xl h-12'
+                            onPress={onGooglePress}
+                        >
+                            <ButtonText>Continue with Google</ButtonText>
+                        </Button>
+                        <Button
+                            variant="outline"
+                            className='rounded-3xl h-12'
+                            onPress={onApplePress}
+                        >
+                            <ButtonText>Continue with Apple</ButtonText>
+                        </Button>
+                    </VStack>
+
+                    <HStack className="justify-center items-center space-x-2">
+                        <Text className="text-typography-600">
+                            Don't have an account?
+                        </Text>
+                        <Link href="/signup">
+                            <Text className="text-primary-600 font-medium">
+                                Sign Up
+                            </Text>
+                        </Link>
+                    </HStack>
                 </VStack>
             </VStack>
         </Container>

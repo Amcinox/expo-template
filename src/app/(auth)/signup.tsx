@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'expo-router';
 import { useSettings } from '@/contexts/SettingsContext';
-import { useSignUp } from '@clerk/clerk-expo';
+import { useSignUp, useOAuth } from '@clerk/clerk-expo';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 
 // Components
 import { VStack } from "@/components/ui/vstack"
@@ -18,6 +18,7 @@ import { EyeIcon, EyeOffIcon } from "@/components/ui/icon"
 import { InputIcon, InputSlot } from '@/components/ui/input';
 import { Link } from 'expo-router';
 import { Text } from '@/components/ui/text';
+import { Divider } from '@/components/ui/divider';
 
 // Validation
 import { z } from 'zod';
@@ -37,6 +38,8 @@ type SignUpPayload = z.infer<typeof SignUpSchema>;
 export default function SignUpScreen() {
     const router = useRouter();
     const { signUp, setActive, isLoaded } = useSignUp();
+    const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
+    const { startOAuthFlow: startAppleOAuth } = useOAuth({ strategy: "oauth_apple" });
     const { toggleSplashLoading, theme } = useSettings();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -78,6 +81,30 @@ export default function SignUpScreen() {
             toggleSplashLoading(false);
         }
     });
+
+    const onGooglePress = async () => {
+        try {
+            const { createdSessionId, setActive } = await startOAuthFlow();
+            if (createdSessionId && setActive) {
+                await setActive({ session: createdSessionId });
+                router.replace('/');
+            }
+        } catch (err) {
+            console.error('OAuth error:', err);
+        }
+    };
+
+    const onApplePress = async () => {
+        try {
+            const { createdSessionId, setActive } = await startAppleOAuth();
+            if (createdSessionId && setActive) {
+                await setActive({ session: createdSessionId });
+                router.replace('/');
+            }
+        } catch (err) {
+            console.error('OAuth error:', err);
+        }
+    };
 
     return (
         <Container>
@@ -152,18 +179,41 @@ export default function SignUpScreen() {
                                 </ButtonText>
                             )}
                         </Button>
-
-                        <HStack className="justify-center items-center space-x-2">
-                            <Text className="text-typography-600">
-                                Already have an account?
-                            </Text>
-                            <Link href="/signin">
-                                <Text className="text-primary-600 font-medium">
-                                    Sign In
-                                </Text>
-                            </Link>
-                        </HStack>
                     </FormProvider>
+
+                    <View className="flex-row items-center my-4">
+                        <Divider className="flex-1" />
+                        <Text className="mx-4 text-typography-400">or</Text>
+                        <Divider className="flex-1" />
+                    </View>
+
+                    <VStack space="md">
+                        <Button
+                            variant="outline"
+                            className='rounded-3xl h-12'
+                            onPress={onGooglePress}
+                        >
+                            <ButtonText>Continue with Google</ButtonText>
+                        </Button>
+                        <Button
+                            variant="outline"
+                            className='rounded-3xl h-12'
+                            onPress={onApplePress}
+                        >
+                            <ButtonText>Continue with Apple</ButtonText>
+                        </Button>
+                    </VStack>
+
+                    <HStack className="justify-center items-center space-x-2">
+                        <Text className="text-typography-600">
+                            Already have an account?
+                        </Text>
+                        <Link href="/signin">
+                            <Text className="text-primary-600 font-medium">
+                                Sign In
+                            </Text>
+                        </Link>
+                    </HStack>
                 </VStack>
             </VStack>
         </Container>
